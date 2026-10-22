@@ -1,0 +1,3214 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pool of problems</title>
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%23ff9f43' d='M10 32 2 20v24l8-12c8-10 18-15 31-15 9 0 16 4 21 15-5 11-12 15-21 15-13 0-23-5-31-15Z'/%3E%3Ccircle cx='49' cy='27' r='3' fill='white'/%3E%3Ccircle cx='50' cy='27' r='1.5' fill='%2317354a'/%3E%3C/svg%3E">
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: Inter, ui-rounded, "Arial Rounded MT Bold", system-ui, sans-serif;
+      color: #17354a;
+      background: #eaf8f7;
+      font-synthesis: none;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .app {
+      width: min(100% - 32px, 1040px);
+      margin: 32px auto;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.7rem, 5vw, 2.4rem);
+      letter-spacing: -.04em;
+    }
+
+    .subtitle {
+      margin: 5px 0 0;
+      color: #577487;
+    }
+
+    .wallet {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 11px 16px;
+      border: 1px solid #c9e9e5;
+      border-radius: 16px;
+      background: #fff;
+      font-weight: 800;
+      white-space: nowrap;
+      box-shadow: 0 5px 18px #214b5710;
+    }
+
+    .wallet span {
+      font-size: 1.35rem;
+    }
+
+    nav {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .tab {
+      border: 0;
+      border-radius: 12px;
+      padding: 11px 19px;
+      background: #d8efed;
+      color: #416476;
+      font-weight: 750;
+    }
+
+    .tab[aria-selected="true"] {
+      color: white;
+      background: #147e91;
+      box-shadow: 0 4px 10px #147e9133;
+    }
+
+    .panel {
+      padding: clamp(16px, 4vw, 28px);
+      border: 1px solid #d5eae8;
+      border-radius: 22px;
+      background: white;
+      box-shadow: 0 12px 40px #214b5710;
+    }
+
+    .aquarium-scene {
+      position: relative;
+      overflow: hidden;
+      border: 8px solid #acd9d8;
+      border-radius: 18px;
+      background: #75cdd8;
+    }
+
+    #aquarium-canvas {
+      display: block;
+      width: 100%;
+      aspect-ratio: 900 / 360;
+      min-height: 260px;
+      max-height: 420px;
+      cursor: grab;
+      touch-action: none;
+    }
+
+    #aquarium-canvas:focus-visible {
+      outline: 4px solid #147e91;
+      outline-offset: 3px;
+    }
+
+    .fish-roster {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .roster-fish {
+      border: 1px solid #cde6e3;
+      border-radius: 999px;
+      padding: 8px 12px;
+      color: #25566a;
+      background: #f2f9f8;
+      font-size: .85rem;
+      font-weight: 750;
+    }
+
+    .food-station {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .food-jar-wrap {
+      position: relative;
+    }
+
+    .food-jar {
+      position: relative;
+      display: grid;
+      place-items: center;
+      width: 104px;
+      height: 116px;
+      overflow: hidden;
+      border: 4px solid #83b9bc;
+      border-radius: 20px 20px 25px 25px;
+      background: #e3f6f2;
+      cursor: grab;
+      touch-action: none;
+      user-select: none;
+    }
+
+    .food-jar:active {
+      cursor: grabbing;
+    }
+
+    .food-jar:focus-visible {
+      outline: 3px solid #147e91;
+      outline-offset: 3px;
+    }
+
+    .super-food-flask {
+      width: 52px;
+      border-color: #9a86c7;
+      border-radius: 30px 30px 22px 22px;
+      background: #f1eafa;
+    }
+
+    .super-food-flask .jar-lid {
+      left: 8px;
+      right: 8px;
+      background: #75609f;
+    }
+
+    .super-food-flask .jar-fill {
+      background: linear-gradient(#c9a5f2, #8d5fd3);
+    }
+
+    .super-food-flask .jar-food {
+      filter: hue-rotate(145deg) saturate(1.5);
+    }
+
+    .yummy-food-flask {
+      border-color: #d3aa5a;
+      border-radius: 20px 20px 30px 30px;
+      background: #fff5d9;
+    }
+
+    .yummy-food-flask .jar-lid {
+      background: #a67b2f;
+    }
+
+    .yummy-food-flask .jar-fill {
+      background: linear-gradient(#ffc3df, #e56aa7);
+    }
+
+    .yummy-food-flask .jar-food {
+      filter: hue-rotate(300deg) saturate(1.4);
+    }
+
+    .jar-fill {
+      position: absolute;
+      inset: auto 0 0;
+      height: 0;
+      background: linear-gradient(#ffd977, #f4ae50);
+      transition: height .35s ease;
+      opacity: .86;
+    }
+
+    .jar-food {
+      position: relative;
+      z-index: 1;
+      margin-top: -20px;
+      font-size: 2rem;
+    }
+
+    .jar-count {
+      position: absolute;
+      z-index: 2;
+      inset: auto 0 8px;
+      color: #17354a;
+      font-size: .9rem;
+      font-weight: 850;
+      text-align: center;
+      text-shadow: 0 1px #fff9;
+    }
+
+    .jar-lid {
+      position: absolute;
+      z-index: 3;
+      top: -4px;
+      left: 8px;
+      right: 8px;
+      height: 10px;
+      border-radius: 5px;
+      background: #5b9299;
+    }
+
+    .jar-copy {
+      position: absolute;
+      z-index: 10;
+      top: 50%;
+      left: calc(100% + 12px);
+      display: none;
+      width: min(400px, calc(100vw - 180px));
+      padding: 12px 14px;
+      transform: translateY(-50%);
+      border: 1px solid #c9e9e5;
+      border-radius: 12px;
+      background: white;
+      color: #456779;
+      line-height: 1.5;
+      box-shadow: 0 8px 24px #214b5722;
+    }
+
+    .food-jar-wrap:hover .jar-copy,
+    .food-jar-wrap:focus-within .jar-copy {
+      display: block;
+    }
+
+    .jar-copy strong {
+      color: #17354a;
+    }
+
+    .fish-editor-list {
+      display: grid;
+      gap: 14px;
+      margin-top: 20px;
+    }
+
+    .fish-editor {
+      display: grid;
+      grid-template-columns: 70px minmax(150px, 1fr) repeat(2, minmax(130px, .7fr));
+      align-items: end;
+      gap: 12px;
+      padding: 16px;
+      border: 1px solid #d7eae8;
+      border-radius: 16px;
+      background: #f9fdfc;
+    }
+
+    .editor-preview {
+      align-self: center;
+      font-size: 2.6rem;
+      text-align: center;
+    }
+
+    .field {
+      display: grid;
+      gap: 5px;
+      color: #526e7d;
+      font-size: .84rem;
+      font-weight: 750;
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      min-height: 42px;
+      padding: 8px 10px;
+      border: 1px solid #aacdca;
+      border-radius: 10px;
+      background: white;
+      color: #17354a;
+    }
+
+    input[type="color"] {
+      padding: 4px;
+    }
+
+    .fish-daily-progress {
+      grid-column: 2 / -1;
+      color: #5c7685;
+      font-size: .85rem;
+    }
+
+    .care-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    .care-copy {
+      color: #456779;
+      line-height: 1.5;
+    }
+
+    .care-copy strong {
+      color: #17354a;
+    }
+
+    .stats {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .stat {
+      padding: 9px 12px;
+      border-radius: 12px;
+      background: #f0f8f7;
+      font-size: .9rem;
+      font-weight: 750;
+    }
+
+    .stat span {
+      color: #126f80;
+    }
+
+    .section-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      margin: 0 0 5px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 1.4rem;
+    }
+
+    .muted {
+      color: #5c7685;
+      line-height: 1.55;
+    }
+
+    .shop-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    .shop-card {
+      padding: 20px;
+      border: 1px solid #d7eae8;
+      border-radius: 18px;
+      background: #f9fdfc;
+    }
+
+    .shop-icon {
+      font-size: 2.2rem;
+    }
+
+    .shop-card h3 {
+      margin: 8px 0 5px;
+    }
+
+    .shop-card p {
+      min-height: 46px;
+      margin: 0 0 14px;
+      color: #5c7685;
+      line-height: 1.45;
+    }
+
+    .primary,
+    .secondary {
+      border: 0;
+      border-radius: 11px;
+      padding: 10px 14px;
+      font-weight: 800;
+    }
+
+    .primary {
+      color: white;
+      background: #147e91;
+    }
+
+    .primary:hover:not(:disabled) {
+      background: #0e6a7d;
+    }
+
+    .secondary {
+      color: #335a6a;
+      background: #e5f1f0;
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: .5;
+    }
+
+    .math-box {
+      margin-top: 16px;
+      padding: 18px;
+      border-radius: 15px;
+      background: #eaf7f6;
+    }
+
+    .math-question {
+      margin: 4px 0 12px;
+      font-size: 1.8rem;
+      font-weight: 850;
+      letter-spacing: .02em;
+    }
+
+    .answer-row {
+      display: flex;
+      gap: 9px;
+      flex-wrap: wrap;
+    }
+
+    .answer-row input {
+      width: 130px;
+      min-height: 42px;
+      padding: 8px 11px;
+      border: 1px solid #aacdca;
+      border-radius: 10px;
+      background: white;
+    }
+
+    .feedback {
+      min-height: 24px;
+      margin: 10px 0 0;
+      font-weight: 700;
+    }
+
+    .feedback.error {
+      color: #a63e48;
+    }
+
+    .feedback.success {
+      color: #20734d;
+    }
+
+    .notice {
+      margin: 0 0 14px;
+      padding: 11px 14px;
+      border-radius: 12px;
+      background: #fff4d5;
+      color: #735516;
+      line-height: 1.45;
+    }
+
+    .notice[hidden] {
+      display: none;
+    }
+
+    .rule {
+      margin-top: 20px;
+      padding: 14px 16px;
+      border-radius: 13px;
+      background: #f2f8f8;
+      color: #526e7d;
+      line-height: 1.55;
+    }
+
+    .rule p {
+      margin: 4px 0;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .tutorial-trigger {
+      border: 1px solid #c9e9e5;
+      border-radius: 10px;
+      padding: 8px 12px;
+      color: #176b7b;
+      background: white;
+      font-size: .9rem;
+      font-weight: 750;
+    }
+
+    .tutorial-shade {
+      position: fixed;
+      z-index: 1000;
+      inset: 0;
+      background: #08293775;
+    }
+
+    .tutorial-shade[hidden],
+    .tutorial-arrow[hidden],
+    .tutorial-card[hidden] {
+      display: none;
+    }
+
+    .tutorial-arrow {
+      position: fixed;
+      z-index: 1002;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+      pointer-events: none;
+    }
+
+    .tutorial-card {
+      position: fixed;
+      z-index: 1003;
+      width: min(360px, calc(100vw - 32px));
+      padding: 20px;
+      border: 2px solid #b5e2dc;
+      border-radius: 18px;
+      background: white;
+      box-shadow: 0 18px 55px #08293750;
+    }
+
+    .tutorial-card h2 {
+      margin: 0 0 8px;
+      font-size: 1.25rem;
+    }
+
+    .tutorial-card p {
+      margin: 0;
+      color: #526e7d;
+      line-height: 1.55;
+    }
+
+    .tutorial-actions {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 17px;
+    }
+
+    .tutorial-actions button {
+      border: 0;
+      border-radius: 10px;
+      padding: 9px 12px;
+      color: #335a6a;
+      background: #e5f1f0;
+      font-weight: 750;
+    }
+
+    .tutorial-actions .primary {
+      color: white;
+      background: #147e91;
+    }
+
+    .tutorial-step-count {
+      margin-bottom: 6px;
+      color: #147e91;
+      font-size: .78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .tutorial-target {
+      position: relative !important;
+      z-index: 1001 !important;
+      pointer-events: none !important;
+      box-shadow: 0 0 0 5px #ffdc61, 0 0 0 10px #ffdc6160 !important;
+    }
+
+    .developer-tools {
+      margin-top: 36px;
+      padding: 18px;
+      border: 1px dashed #91b3b5;
+      border-radius: 16px;
+      background: #f2f8f8;
+    }
+
+    .developer-tools h2 {
+      font-size: 1.1rem;
+    }
+
+    .developer-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .developer-console {
+      margin-top: 14px;
+      padding: 14px;
+      border: 1px solid #b9d1cb;
+      border-radius: 13px;
+      background: #10251f;
+      color: #c9f7d1;
+    }
+
+    .developer-console-output {
+      min-height: 72px;
+      max-height: 220px;
+      overflow: auto;
+      margin: 0 0 12px;
+      color: #a4eeb2;
+      font: .88rem/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .developer-command-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .developer-command-row input {
+      flex: 1;
+      min-width: 0;
+      min-height: 42px;
+      padding: 8px 11px;
+      border: 1px solid #537a62;
+      border-radius: 9px;
+      background: #08150f;
+      color: #e8ffeb;
+      font: .9rem ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+
+    .developer-command-row input:focus-visible {
+      outline: 2px solid #69dc7f;
+      outline-offset: 2px;
+    }
+
+    .page-footer {
+      min-height: 56px;
+    }
+
+    .corner-button {
+      position: fixed;
+      z-index: 5;
+      bottom: 16px;
+      left: 16px;
+      border: 1px solid #cda6a6;
+      border-radius: 10px;
+      padding: 9px 12px;
+      color: #85454a;
+      background: #fff8f7;
+      font-size: .82rem;
+      font-weight: 750;
+      box-shadow: 0 4px 14px #17354a18;
+    }
+
+    .corner-controls {
+      display: flex;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 18px 0;
+    }
+
+    .corner-controls .corner-button {
+      position: static;
+    }
+
+    .account-control {
+      position: relative;
+    }
+
+    .account-menu {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      display: grid;
+      gap: 6px;
+      width: max-content;
+      max-width: min(320px, calc(100vw - 32px));
+      padding: 8px;
+      border: 1px solid #c9e9e5;
+      border-radius: 12px;
+      background: white;
+      box-shadow: 0 8px 24px #214b5722;
+    }
+
+    .account-menu[hidden] {
+      display: none;
+    }
+
+    .account-option {
+      width: 100%;
+      border: 0;
+      border-radius: 8px;
+      padding: 9px 11px;
+      color: #335a6a;
+      background: #f2f8f8;
+      font-weight: 750;
+      text-align: left;
+    }
+
+    #account-options {
+      display: grid;
+      gap: 6px;
+    }
+
+    .account-option:hover,
+    .account-option:focus-visible {
+      background: #d8efed;
+    }
+
+    .app-dialog {
+      position: fixed;
+      z-index: 1100;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      background: #08293775;
+    }
+
+    .app-dialog[hidden],
+    .developer-tools[hidden] {
+      display: none;
+    }
+
+    .dialog-card {
+      width: min(420px, 100%);
+      padding: 22px;
+      border: 2px solid #b5e2dc;
+      border-radius: 18px;
+      background: white;
+      box-shadow: 0 18px 55px #08293750;
+    }
+
+    .dialog-card h2 {
+      margin-bottom: 8px;
+    }
+
+    .dialog-card p {
+      color: #526e7d;
+      line-height: 1.5;
+    }
+
+    .dialog-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .zero-fish-dialog {
+      position: fixed;
+      z-index: 1200;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      background: #082937a8;
+    }
+
+    .zero-fish-dialog[hidden] {
+      display: none;
+    }
+
+    .zero-fish-card {
+      width: min(440px, 100%);
+      padding: 24px;
+      border: 3px solid #f0b5a9;
+      border-radius: 20px;
+      background: white;
+      box-shadow: 0 18px 55px #08293770;
+    }
+
+    .zero-fish-card h2 {
+      margin: 0 0 12px;
+      color: #a63e48;
+      font-size: 1.7rem;
+    }
+
+    .zero-fish-card p {
+      margin: 0;
+      color: #526e7d;
+      line-height: 1.6;
+    }
+
+    .zero-fish-card .dialog-actions {
+      justify-content: center;
+    }
+
+    .try-again {
+      border: 0;
+      border-radius: 11px;
+      padding: 11px 20px;
+      color: white;
+      background: #c93642;
+      font-weight: 850;
+    }
+
+    .try-again:hover {
+      background: #a92733;
+    }
+
+    .dialog-error {
+      min-height: 22px;
+      margin: 8px 0 0;
+      color: #a63e48;
+      font-weight: 700;
+    }
+
+    @media (max-width: 560px) {
+      .app {
+        width: min(100% - 20px, 1040px);
+        margin: 18px auto;
+      }
+
+      header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      #aquarium-canvas {
+        min-height: 240px;
+      }
+
+      .fish-editor {
+        grid-template-columns: 56px 1fr;
+      }
+
+      .fish-editor .field {
+        grid-column: 2;
+      }
+
+      .fish-daily-progress {
+        grid-column: 2;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="app">
+    <header>
+      <div>
+        <h1>Pool of problems</h1>
+        <p class="subtitle">Care for your fish a little every day.</p>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <button class="tutorial-trigger" id="tutorial-trigger" type="button">❔ How to play</button>
+        <div class="wallet" aria-label="Mathcoins"><span aria-hidden="true">🪙</span><span id="coin-count">0</span>
+          Mathcoins</div>
+      </div>
+    </header>
+
+    <nav aria-label="Main navigation">
+      <button class="tab" id="aquarium-tab" type="button" role="tab" aria-selected="true">🐠 Aquarium</button>
+      <button class="tab" id="shop-tab" type="button" role="tab" aria-selected="false">🛍️ Shop</button>
+      <button class="tab" id="fishes-tab" type="button" role="tab" aria-selected="false">🐟 Fishes</button>
+      <button class="tab" id="other-tab" type="button" role="tab" aria-selected="false">⚙️ Other</button>
+    </nav>
+
+    <p class="notice" id="notice" role="status" aria-live="polite" hidden></p>
+
+    <section class="panel" id="aquarium-panel" role="tabpanel" aria-labelledby="aquarium-tab">
+      <div class="section-heading">
+        <h2>Your aquarium</h2>
+        <span class="muted" id="fish-count"></span>
+      </div>
+      <p class="muted">Drag food from the jar or super-food flask onto a fish. Each fish needs <strong>10 food before midnight</strong>.</p>
+      <div class="aquarium-scene">
+        <canvas id="aquarium-canvas" tabindex="0" role="img"
+          aria-label="Animated aquarium. Drag food onto a fish to feed it."></canvas>
+      </div>
+      <div class="fish-roster" id="fish-roster" aria-label="Fish and feeding progress"></div>
+      <div class="food-station">
+        <div class="food-jar-wrap">
+          <button class="food-jar" id="food-jar" type="button" aria-label="Food jar. Drag one food to a fish."
+            title="Drag from the jar onto a fish">
+            <span class="jar-lid" aria-hidden="true"></span>
+            <span class="jar-fill" id="jar-fill" aria-hidden="true"></span>
+            <span class="jar-food" aria-hidden="true">🍤</span>
+            <span class="jar-count" id="food-count">0 / 50</span>
+          </button>
+          <div class="jar-copy"><strong>Food jar</strong> · Earn all food manually in the Shop by solving a math
+            question; each correct answer adds 1 food, up to 50. Then drag from the jar onto a fish to feed it.</div>
+        </div>
+        <div class="food-jar-wrap">
+          <button class="food-jar super-food-flask" id="super-food-flask" type="button"
+            aria-label="Super-food flask. Drag one serving to a fish." title="Drag from the flask onto a fish to restore 2 hunger">
+            <span class="jar-lid" aria-hidden="true"></span>
+            <span class="jar-fill" id="super-food-fill" aria-hidden="true"></span>
+            <span class="jar-food" aria-hidden="true">🧪</span>
+            <span class="jar-count" id="super-food-count">0 / 50</span>
+          </button>
+          <div class="jar-copy"><strong>Super-food flask</strong> · Drag a serving onto a fish to restore 2 hunger.
+            Earn servings in the Shop by solving decimal-fraction questions.</div>
+        </div>
+        <div class="food-jar-wrap">
+          <button class="food-jar yummy-food-flask" id="yummy-food-flask" type="button"
+            aria-label="Yummy-food jar. Drag one serving to a fish." title="Drag from the jar onto a fish">
+            <span class="jar-lid" aria-hidden="true"></span>
+            <span class="jar-fill" id="yummy-food-fill" aria-hidden="true"></span>
+            <span class="jar-food" aria-hidden="true">🍬</span>
+            <span class="jar-count" id="yummy-food-count">0 / 50</span>
+          </button>
+          <div class="jar-copy"><strong>Yummy-food jar</strong> · Each serving restores 1 hunger, with a 33% chance
+            to restore 2 instead. Earn servings in the Shop by solving an algebra question.</div>
+        </div>
+      </div>
+      <div class="care-bar">
+        <div class="care-copy" id="deadline-copy"></div>
+        <div class="stats">
+          <div class="stat">Streak: <span id="streak-count">0 days</span> 🔥</div>
+        </div>
+      </div>
+      <div class="rule">
+        <p><strong>Daily care:</strong> Feed every fish 10 times before midnight or that fish will die.</p>
+        <p><strong>Streak reward:</strong> Complete everyone's daily quota to keep your streak. Earn 1 Mathcoin for
+          every 2 consecutive days.</p>
+      </div>
+    </section>
+
+    <section class="panel" id="shop-panel" role="tabpanel" aria-labelledby="shop-tab" hidden>
+      <h2>Little shop</h2>
+      <p class="muted">Solve a math question to earn regular food, or a decimal-fraction question for super food. Save Mathcoins to welcome another fish.</p>
+      <div class="shop-grid">
+        <article class="shop-card">
+          <div class="shop-icon" aria-hidden="true">🍤</div>
+          <h3>One food</h3>
+          <p>Answer one addition, subtraction, multiplication, or division question to get 1 food.</p>
+          <button class="primary" id="buy-food" type="button">Get 1 food · Math question</button>
+          <div class="math-box" id="math-box" hidden>
+            <div>Answer to earn 1 food:</div>
+            <div class="math-question" id="math-question"></div>
+            <form class="answer-row" id="answer-form">
+              <label class="sr-only" for="math-answer">Your answer</label>
+              <input id="math-answer" type="number" step="1" inputmode="numeric" autocomplete="off" required>
+              <button class="primary" type="submit">Check answer</button>
+            </form>
+            <p class="feedback" id="math-feedback" aria-live="polite"></p>
+          </div>
+        </article>
+        <article class="shop-card">
+          <div class="shop-icon" aria-hidden="true">🧪</div>
+          <h3>Super food</h3>
+          <p>Solve a decimal-fraction question to earn one super-food serving. Each serving restores up to 2 hunger.</p>
+          <button class="primary" id="buy-super-food" type="button">Get 1 super food · Decimal question</button>
+          <div class="math-box" id="super-food-math-box" hidden>
+            <div>Answer to earn 1 super-food serving:</div>
+            <div class="math-question" id="super-food-math-question"></div>
+            <form class="answer-row" id="super-food-answer-form">
+              <label class="sr-only" for="super-food-math-answer">Your answer</label>
+              <input id="super-food-math-answer" type="number" step="any" inputmode="decimal" autocomplete="off" required>
+              <button class="primary" type="submit">Check answer</button>
+            </form>
+            <p class="feedback" id="super-food-math-feedback" aria-live="polite"></p>
+          </div>
+        </article>
+        <article class="shop-card">
+          <div class="shop-icon" aria-hidden="true">🍬</div>
+          <h3>Yummy food</h3>
+          <p>Solve a basic algebra question to earn one serving. It restores 1 hunger, with a 33% chance to restore 2 instead.</p>
+          <button class="primary" id="buy-yummy-food" type="button">Get 1 yummy food · Algebra question</button>
+          <div class="math-box" id="yummy-food-math-box" hidden>
+            <div>Solve for the missing number:</div>
+            <div class="math-question" id="yummy-food-math-question"></div>
+            <form class="answer-row" id="yummy-food-answer-form">
+              <label class="sr-only" for="yummy-food-math-answer">Missing number</label>
+              <input id="yummy-food-math-answer" type="number" step="1" inputmode="numeric" autocomplete="off" required>
+              <button class="primary" type="submit">Check answer</button>
+            </form>
+            <p class="feedback" id="yummy-food-math-feedback" aria-live="polite"></p>
+          </div>
+        </article>
+        <article class="shop-card">
+          <div class="shop-icon" aria-hidden="true">🐡</div>
+          <h3>A new fish</h3>
+          <p>Bring home a new fish for 4 Mathcoins. It has its own 10-food daily quota.</p>
+          <button class="primary" id="buy-fish" type="button">Buy a fish · 4 🪙</button>
+        </article>
+        <article class="shop-card">
+          <div class="shop-icon" aria-hidden="true">🌿</div>
+          <h3>Seaweed</h3>
+          <p>Add a leafy decoration to your aquarium. Click where you want to place it.</p>
+          <button class="primary" id="buy-seaweed" type="button">Buy seaweed · 2 🪙</button>
+        </article>
+        <article class="shop-card">
+          <div class="shop-icon" aria-hidden="true">🏰</div>
+          <h3>Stone castle</h3>
+          <p>Add a stone castle decoration. Hover over it and press E to enlarge or Q to shrink it.</p>
+          <button class="primary" id="buy-castle" type="button">Buy stone castle · 5 🪙</button>
+        </article>
+      </div>
+    </section>
+
+    <section class="panel" id="fishes-panel" role="tabpanel" aria-labelledby="fishes-tab" hidden>
+      <h2>Your fishes</h2>
+      <p class="muted">Give your fish a name, choose a color, and pick a body shape. Changes appear in the aquarium
+        right away.</p>
+      <div class="fish-editor-list" id="fish-editor-list"></div>
+      <p class="muted" id="no-fishes" hidden>No fish to customize yet. Buy a fish from the shop.</p>
+    </section>
+
+    <section class="panel" id="other-panel" role="tabpanel" aria-labelledby="other-tab" hidden>
+      <h2>Other</h2>
+      <p class="muted">Manage your accounts, reset your progress, or use the PIN-protected developer console.</p>
+      <div class="corner-controls">
+        <button class="corner-button" id="reset-trigger" type="button">⚠ Hard reset</button>
+        <div class="account-control">
+          <button class="corner-button" id="account-trigger" type="button" aria-haspopup="menu"
+            aria-expanded="false">Change account</button>
+          <div class="account-menu" id="account-menu" role="menu" aria-label="Change account" hidden>
+            <div id="account-options"></div>
+            <button class="account-option" id="create-account" type="button" role="menuitem">＋ Create new account</button>
+          </div>
+        </div>
+        <button class="corner-button" id="developer-trigger" type="button">🔒 Developer mode</button>
+      </div>
+    <section class="developer-tools" id="developer-tools" hidden>
+      <h2>🛠️ Developer console</h2>
+      <p class="muted">Fish names are matched exactly, ignoring case. Use <code>_all_</code> to target every fish.</p>
+      <div class="developer-console">
+        <pre class="developer-console-output" id="developer-console-output" role="log" aria-live="polite"></pre>
+        <form class="developer-command-row" id="developer-command-form">
+          <label class="sr-only" for="developer-command">Developer command</label>
+          <input id="developer-command" type="text" autocomplete="off" spellcheck="false"
+            placeholder="e.g. add 10 coins" aria-describedby="developer-command-help">
+          <button class="primary" type="submit">Run</button>
+        </form>
+      </div>
+      <p class="muted" id="developer-command-help">
+        Commands: <code>buy 123</code> · <code>buy NameHere, NameThere</code> ·
+        <code>kill NameHere</code> · <code>give NameHere 123 food</code> ·
+        <code>immortal NameHere true/false</code> · <code>add 123 coins</code> · <code>add 123 food</code> ·
+        <code>add 123 super food</code> · <code>add 123 yummy food</code> ·
+        <code>jump 123</code> (seconds) · <code>clear</code>
+      </p>
+      <div class="developer-actions">
+        <button class="secondary" id="dev-lock" type="button">Lock developer mode</button>
+      </div>
+    </section>
+    </section>
+    <footer class="page-footer"></footer>
+  </main>
+
+  <div class="tutorial-shade" id="tutorial-shade" hidden></div>
+  <svg class="tutorial-arrow" id="tutorial-arrow" aria-hidden="true" hidden>
+    <defs>
+      <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+        <path d="M0,0 L10,5 L0,10 z" fill="#ffca3a"></path>
+      </marker>
+    </defs>
+    <rect id="tutorial-highlight" x="0" y="0" width="0" height="0" rx="14" fill="none" stroke="#ffdc61" stroke-width="5"
+      stroke-dasharray="10 6"></rect>
+    <path id="tutorial-arrow-path" d="" fill="none" stroke="#ffca3a" stroke-width="5" stroke-linecap="round"
+      stroke-dasharray="9 7" marker-end="url(#arrowhead)"></path>
+  </svg>
+  <aside class="tutorial-card" id="tutorial-card" role="dialog" aria-modal="true" aria-labelledby="tutorial-title"
+    hidden>
+    <div class="tutorial-step-count" id="tutorial-step-count"></div>
+    <h2 id="tutorial-title"></h2>
+    <p id="tutorial-copy"></p>
+    <div class="tutorial-actions">
+      <button id="tutorial-skip" type="button">Skip tutorial</button>
+      <div style="display:flex;gap:8px">
+        <button id="tutorial-back" type="button">Back</button>
+        <button class="primary" id="tutorial-next" type="button">Next →</button>
+      </div>
+    </div>
+  </aside>
+  <div class="app-dialog" id="developer-dialog" hidden>
+    <form class="dialog-card" id="developer-form">
+      <h2>Unlock developer mode</h2>
+      <p>Enter the developer PIN to access testing controls.</p>
+      <label class="field" for="developer-pin">Developer PIN
+        <input id="developer-pin" type="password" inputmode="numeric" autocomplete="off" maxlength="8" required>
+      </label>
+      <p class="dialog-error" id="developer-error" aria-live="polite"></p>
+      <div class="dialog-actions">
+        <button class="secondary" id="developer-cancel" type="button">Cancel</button>
+        <button class="primary" type="submit">Unlock</button>
+      </div>
+    </form>
+  </div>
+  <div class="app-dialog" id="reset-dialog" hidden>
+    <section class="dialog-card">
+      <h2 id="reset-title">Hard reset?</h2>
+      <p id="reset-copy">This permanently deletes your fish, food, coins, and streak from this browser.</p>
+      <div id="reset-final" hidden>
+        <label class="field" for="reset-confirmation">Type RESET to confirm
+          <input id="reset-confirmation" type="text" autocomplete="off">
+        </label>
+      </div>
+      <div class="dialog-actions">
+        <button class="secondary" id="reset-cancel" type="button">Cancel</button>
+        <button class="primary" id="reset-continue" type="button">Continue</button>
+        <button class="primary" id="reset-confirm" type="button" hidden disabled>Reset account</button>
+      </div>
+    </section>
+  </div>
+  <div class="zero-fish-dialog" id="zero-fish-dialog" role="dialog" aria-modal="true" aria-labelledby="zero-fish-title"
+    aria-describedby="zero-fish-copy" hidden>
+    <section class="zero-fish-card">
+      <h2 id="zero-fish-title">OH SNAP!</h2>
+      <p id="zero-fish-copy"></p>
+      <div class="dialog-actions">
+        <button class="primary" id="zero-fish-action" type="button"></button>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    (() => {
+      'use strict';
+      const FOOD_QUOTA = 10;
+      const FOOD_CAP = 50;
+      const SUPER_FOOD_CAP = 50;
+      const YUMMY_FOOD_CAP = 50;
+      const FISH_COST = 4;
+      const LEGACY_STORAGE_KEY = 'little-aquarium-save-v1';
+      const ACCOUNTS_KEY = 'little-aquarium-accounts-v1';
+      const ACTIVE_ACCOUNT_KEY = 'little-aquarium-active-account-v1';
+      const DEVELOPER_PIN = '31415926';
+      const fishNames = ['Bubbles', 'Coral', 'Finn', 'Pebble', 'Sunny', 'Mochi', 'Splash', 'Pip'];
+      const fishLooks = ['🐠', '🐟', '🐡', '🐬', '🦈'];
+      const fishShapes = [
+        { value: 'classic', label: 'Classic' },
+        { value: 'round', label: 'Round' },
+        { value: 'long', label: 'Long' },
+        { value: 'angelfish', label: 'Angelfish' }
+      ];
+      const elements = {
+        aquariumTab: document.getElementById('aquarium-tab'),
+        shopTab: document.getElementById('shop-tab'),
+        otherTab: document.getElementById('other-tab'),
+        aquariumPanel: document.getElementById('aquarium-panel'),
+        shopPanel: document.getElementById('shop-panel'),
+        otherPanel: document.getElementById('other-panel'),
+        fishesTab: document.getElementById('fishes-tab'),
+        fishesPanel: document.getElementById('fishes-panel'),
+        canvas: document.getElementById('aquarium-canvas'),
+        fishRoster: document.getElementById('fish-roster'),
+        fishEditorList: document.getElementById('fish-editor-list'),
+        noFishes: document.getElementById('no-fishes'),
+        foodJar: document.getElementById('food-jar'),
+        superFoodFlask: document.getElementById('super-food-flask'),
+        yummyFoodFlask: document.getElementById('yummy-food-flask'),
+        jarFill: document.getElementById('jar-fill'),
+        superFoodFill: document.getElementById('super-food-fill'),
+        yummyFoodFill: document.getElementById('yummy-food-fill'),
+        fishCount: document.getElementById('fish-count'),
+        foodCount: document.getElementById('food-count'),
+        superFoodCount: document.getElementById('super-food-count'),
+        yummyFoodCount: document.getElementById('yummy-food-count'),
+        coinCount: document.getElementById('coin-count'),
+        streakCount: document.getElementById('streak-count'),
+        deadlineCopy: document.getElementById('deadline-copy'),
+        notice: document.getElementById('notice'),
+        buyFood: document.getElementById('buy-food'),
+        buySuperFood: document.getElementById('buy-super-food'),
+        buyYummyFood: document.getElementById('buy-yummy-food'),
+        mathBox: document.getElementById('math-box'),
+        mathQuestion: document.getElementById('math-question'),
+        mathAnswer: document.getElementById('math-answer'),
+        answerForm: document.getElementById('answer-form'),
+        mathFeedback: document.getElementById('math-feedback'),
+        superFoodMathBox: document.getElementById('super-food-math-box'),
+        superFoodMathQuestion: document.getElementById('super-food-math-question'),
+        superFoodMathAnswer: document.getElementById('super-food-math-answer'),
+        superFoodAnswerForm: document.getElementById('super-food-answer-form'),
+        superFoodMathFeedback: document.getElementById('super-food-math-feedback'),
+        yummyFoodMathBox: document.getElementById('yummy-food-math-box'),
+        yummyFoodMathQuestion: document.getElementById('yummy-food-math-question'),
+        yummyFoodMathAnswer: document.getElementById('yummy-food-math-answer'),
+        yummyFoodAnswerForm: document.getElementById('yummy-food-answer-form'),
+        yummyFoodMathFeedback: document.getElementById('yummy-food-math-feedback'),
+        buyFish: document.getElementById('buy-fish'),
+        buySeaweed: document.getElementById('buy-seaweed'),
+        buyCastle: document.getElementById('buy-castle'),
+        tutorialTrigger: document.getElementById('tutorial-trigger'),
+        tutorialShade: document.getElementById('tutorial-shade'),
+        tutorialArrow: document.getElementById('tutorial-arrow'),
+        tutorialHighlight: document.getElementById('tutorial-highlight'),
+        tutorialArrowPath: document.getElementById('tutorial-arrow-path'),
+        tutorialCard: document.getElementById('tutorial-card'),
+        tutorialStepCount: document.getElementById('tutorial-step-count'),
+        tutorialTitle: document.getElementById('tutorial-title'),
+        tutorialCopy: document.getElementById('tutorial-copy'),
+        tutorialSkip: document.getElementById('tutorial-skip'),
+        tutorialBack: document.getElementById('tutorial-back'),
+        tutorialNext: document.getElementById('tutorial-next'),
+        resetTrigger: document.getElementById('reset-trigger'),
+        resetDialog: document.getElementById('reset-dialog'),
+        resetTitle: document.getElementById('reset-title'),
+        resetCopy: document.getElementById('reset-copy'),
+        resetFinal: document.getElementById('reset-final'),
+        resetConfirmation: document.getElementById('reset-confirmation'),
+        resetCancel: document.getElementById('reset-cancel'),
+        resetContinue: document.getElementById('reset-continue'),
+        resetConfirm: document.getElementById('reset-confirm'),
+        accountTrigger: document.getElementById('account-trigger'),
+        accountMenu: document.getElementById('account-menu'),
+        accountOptions: document.getElementById('account-options'),
+        createAccount: document.getElementById('create-account'),
+        zeroFishDialog: document.getElementById('zero-fish-dialog'),
+        zeroFishCopy: document.getElementById('zero-fish-copy'),
+        zeroFishAction: document.getElementById('zero-fish-action'),
+        developerTrigger: document.getElementById('developer-trigger'),
+        developerDialog: document.getElementById('developer-dialog'),
+        developerForm: document.getElementById('developer-form'),
+        developerPin: document.getElementById('developer-pin'),
+        developerError: document.getElementById('developer-error'),
+        developerCancel: document.getElementById('developer-cancel'),
+        developerTools: document.getElementById('developer-tools'),
+        developerCommandForm: document.getElementById('developer-command-form'),
+        developerCommand: document.getElementById('developer-command'),
+        developerCommandOutput: document.getElementById('developer-console-output'),
+        devLock: document.getElementById('dev-lock')
+      };
+      const canvasContext = elements.canvas.getContext('2d');
+      const fishMotion = new Map();
+      const fishColors = ['#ff9f43', '#f07167', '#a778dc', '#39a9db', '#f2c14e', '#49b89a'];
+      let canvasWidth = 900;
+      let canvasHeight = 360;
+      let lastFrame = 0;
+      let tutorialStep = 0;
+      let tutorialTarget = null;
+      let draggingFood = null;
+      let dragPointer = null;
+      let cursorTarget = null;
+      let decorationTarget = null;
+      let placementType = null;
+      let resizePointerTarget = null;
+      let castlePlacementScale = 2;
+      let foodThoughtsVisible = false;
+      let fishArrival = null;
+      let resetStage = 0;
+      let zeroFishPopupDismissed = false;
+      const tutorialSteps = [
+        { title: 'Welcome to your aquarium!', text: 'Your fish swim around in the tank. Drag a food pellet from the jar onto a fish to feed it.', target: 'aquarium-canvas', tab: 'aquarium' },
+        { title: 'Visit the shop', text: 'Food is earned by solving a short math question. Use the Shop tab to get started.', target: 'shop-tab', tab: 'aquarium' },
+        { title: 'Solve for one food', text: 'Choose “Get 1 food”, then answer the addition, subtraction, multiplication, or division question. Each correct answer adds exactly one food.', target: 'buy-food', tab: 'shop' },
+        { title: 'Earn food manually', text: 'Food is never made automatically. Visit the Shop, answer a math question, and earn one food per correct answer. Your jar holds up to 50 food.', target: 'food-jar', tab: 'aquarium' },
+        { title: 'Super food', text: 'Solve a decimal-fraction question in the Shop to earn super food. Drag a serving from the flask onto a fish to restore 2 hunger.', target: 'super-food-flask', tab: 'aquarium' },
+        { title: 'Yummy food', text: 'Solve an algebra question in the Shop to earn yummy food. Each serving restores 1 hunger, with a 33% chance to restore 2 instead.', target: 'yummy-food-flask', tab: 'aquarium' },
+        { title: 'Feed every fish', text: 'Drag food from its jar or flask and drop it on the fish you want to feed. Each fish needs 10 food before local midnight or it will die.', target: 'aquarium-canvas', tab: 'aquarium' },
+        { title: 'Keep your streak', text: 'Complete every fish’s quota before midnight to continue your streak. You earn 1 Mathcoin for every 2 consecutive days.', target: 'deadline-copy', tab: 'aquarium' },
+        { title: 'Customize your fishes', text: 'The Fishes tab lets you change every fish’s name, color, and body shape. Try out all the options here.', target: 'fishes-tab', tab: 'fishes' },
+        { title: 'Grow your aquarium', text: 'Spend 4 Mathcoins in the Shop to buy another fish. Every fish has its own 10-food quota and can be customized in Fishes.', target: 'buy-fish', tab: 'shop' },
+        { title: 'Decorate your aquarium', text: 'Buy seaweed or a stone castle in the Shop, then move its preview and click in the aquarium to place it.', target: 'buy-castle', tab: 'shop' },
+        { title: 'More options', text: 'The Other tab has account switching, hard reset, and the developer console for testing commands.', target: 'other-tab', tab: 'other' }
+      ];
+      const fishGreetings = [
+        'Hi, I’m {name}!',
+        'Hello there! I’m {name}!',
+        'Hey! {name} here!',
+        'Glub glub! I’m {name}!',
+        'Blub! My name is {name}!',
+        'Hey, I’m {name}! Nice to meet you!',
+        'Greetings, human! I’m {name}.',
+        'Splash! {name} has arrived!',
+        'Hiya! I’m {name}!',
+        'Bubble bubble! {name} reporting in!',
+        'Hey there, fish friend! I’m {name}!',
+        'Oh, hi! I’m {name}!',
+        'Blub blub! You can call me {name}!',
+        'Hello, world! I’m {name}!',
+        '{name} has entered the aquarium!',
+        'Yo! {name} at your service!',
+        'Well, hello! {name}’s the name!',
+        'Pleased to meet you! I’m {name}!'
+      ];
+
+      function localMidnight(timestamp = Date.now()) {
+        const date = new Date(timestamp);
+        date.setHours(0, 0, 0, 0);
+        return date.getTime();
+      }
+
+      function nextLocalMidnight(timestamp = Date.now()) {
+        const date = new Date(timestamp);
+        date.setHours(24, 0, 0, 0);
+        return date.getTime();
+      }
+
+      function gameNow() {
+        const date = new Date();
+        date.setDate(date.getDate() + state.dayOffset);
+        date.setTime(date.getTime() + state.timeOffsetSeconds * 1000);
+        return date.getTime();
+      }
+
+      function makeFish(name = 'Bubbles', look = '🐠', color = '#ff9f43', shape = 'classic') {
+        const createdAt = Date.now();
+        return {
+          id: `${createdAt}-${Math.random().toString(36).slice(2)}`,
+          name,
+          look,
+          color,
+          shape,
+          fed: 0,
+          createdAt
+        };
+      }
+
+      function newGame() {
+        const now = Date.now();
+        return {
+          fishes: [makeFish()],
+          food: 0,
+          superFood: 0,
+          yummyFood: 0,
+          coins: 0,
+          streak: 0,
+          cycleStartedAt: localMidnight(now),
+          dayOffset: 0,
+          timeOffsetSeconds: 0,
+          seaweed: [],
+          seaweedInventory: 0,
+          castles: [],
+          castleInventory: 0,
+          tutorialDone: false,
+          developerUnlocked: false
+        };
+      }
+
+      function validSave(value) {
+        return value && Array.isArray(value.fishes) &&
+          value.fishes.every(fish => fish && typeof fish.id === 'string' && typeof fish.name === 'string' &&
+            typeof fish.look === 'string' && Number.isInteger(fish.fed) && fish.fed >= 0 && fish.fed <= FOOD_QUOTA) &&
+          Number.isInteger(value.food) && value.food >= 0 &&
+          Number.isInteger(value.coins) && value.coins >= 0 &&
+          Number.isInteger(value.streak) && value.streak >= 0 &&
+          Number.isFinite(value.cycleStartedAt);
+      }
+
+      function makeAccount(save) {
+        return {
+          id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+          save
+        };
+      }
+
+      function normalizeSave(save) {
+        save.tutorialDone = save.tutorialDone === true;
+        save.developerUnlocked = save.developerUnlocked === true;
+        save.dayOffset = Number.isInteger(save.dayOffset) && save.dayOffset >= 0 ? save.dayOffset : 0;
+        save.timeOffsetSeconds = Number.isSafeInteger(save.timeOffsetSeconds) && save.timeOffsetSeconds >= 0
+          ? save.timeOffsetSeconds
+          : 0;
+        save.seaweed = Array.isArray(save.seaweed)
+          ? save.seaweed.filter(item => item && Number.isFinite(item.x) && item.x >= 0 && item.x <= 1 &&
+            (item.y === undefined || (Number.isFinite(item.y) && item.y >= 0 && item.y <= 1)))
+          : [];
+        save.seaweedInventory = Number.isSafeInteger(save.seaweedInventory) && save.seaweedInventory >= 0
+          ? save.seaweedInventory
+          : 0;
+        save.castles = Array.isArray(save.castles)
+          ? save.castles.filter(item => item && Number.isFinite(item.x) && item.x >= 0 && item.x <= 1 &&
+            (item.y === undefined || (Number.isFinite(item.y) && item.y >= 0 && item.y <= 1)))
+            .map(item => ({
+              ...item,
+              scale: Number.isFinite(item.scale) ? Math.max(0.5, Math.min(4, item.scale)) : 2
+            }))
+          : [];
+        save.castleInventory = Number.isSafeInteger(save.castleInventory) && save.castleInventory >= 0
+          ? save.castleInventory
+          : 0;
+        delete save.lastFoodAt;
+        save.cycleStartedAt = localMidnight(save.cycleStartedAt);
+        save.food = Math.min(save.food, FOOD_CAP);
+        save.superFood = Number.isSafeInteger(save.superFood) && save.superFood >= 0
+          ? Math.min(save.superFood, SUPER_FOOD_CAP)
+          : 0;
+        save.yummyFood = Number.isSafeInteger(save.yummyFood) && save.yummyFood >= 0
+          ? Math.min(save.yummyFood, YUMMY_FOOD_CAP)
+          : 0;
+        save.fishes.forEach((fish, index) => {
+          const idTimestamp = Number.parseInt(fish.id, 10);
+          fish.createdAt = Number.isFinite(fish.createdAt)
+            ? fish.createdAt
+            : Number.isFinite(idTimestamp) ? idTimestamp : Date.now() + index;
+          fish.devAngryUntil = Number.isFinite(fish.devAngryUntil) && fish.devAngryUntil > 0
+            ? fish.devAngryUntil
+            : 0;
+          fish.immortal = fish.immortal === true;
+          fish.color = /^#[0-9a-f]{6}$/i.test(fish.color || '') ? fish.color : fishColors[index % fishColors.length];
+          fish.shape = fishShapes.some(shape => shape.value === fish.shape) ? fish.shape : 'classic';
+        });
+        return save;
+      }
+
+      function accountName(account) {
+        const oldestLivingFish = account.save.fishes.reduce((oldest, fish) =>
+          !oldest || fish.createdAt < oldest.createdAt ? fish : oldest, null);
+        return oldestLivingFish?.name.trim() || (oldestLivingFish ? 'Unnamed fish' : 'No living fish');
+      }
+
+      let state;
+      let accounts = [];
+      let activeAccountId = '';
+      let storageLoaded = false;
+      try {
+        const serializedAccounts = localStorage.getItem(ACCOUNTS_KEY);
+        const parsedAccounts = serializedAccounts ? JSON.parse(serializedAccounts) : null;
+        if (Array.isArray(parsedAccounts)) {
+          accounts = parsedAccounts.filter(account =>
+            account && typeof account.id === 'string' && validSave(account.save));
+        }
+        const legacySerialized = localStorage.getItem(LEGACY_STORAGE_KEY);
+        if (!accounts.length) {
+          const legacySave = legacySerialized ? JSON.parse(legacySerialized) : null;
+          if (legacySerialized && !validSave(legacySave)) {
+            elements.notice.hidden = false;
+            elements.notice.textContent = 'Your saved aquarium could not be read, so a fresh aquarium was started.';
+          }
+          accounts = [makeAccount(validSave(legacySave) ? legacySave : newGame())];
+        }
+        const savedActiveId = localStorage.getItem(ACTIVE_ACCOUNT_KEY);
+        const activeAccount = accounts.find(account => account.id === savedActiveId) || accounts[0];
+        activeAccountId = activeAccount.id;
+        state = normalizeSave(activeAccount.save);
+        storageLoaded = true;
+      } catch (error) {
+        state = newGame();
+        accounts = [makeAccount(state)];
+        activeAccountId = accounts[0].id;
+        elements.notice.hidden = false;
+        elements.notice.textContent = 'Saving is unavailable in this browser tab. Your aquarium will last until you close the page.';
+      }
+      accounts.forEach(account => {
+        account.save = normalizeSave(account.save);
+      });
+      const selectedAccount = accounts.find(account => account.id === activeAccountId) || accounts[0];
+      activeAccountId = selectedAccount.id;
+      state = selectedAccount.save;
+      if (storageLoaded) {
+        try {
+          localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(accounts));
+          localStorage.setItem(ACTIVE_ACCOUNT_KEY, activeAccountId);
+          localStorage.removeItem(LEGACY_STORAGE_KEY);
+        } catch (error) {
+          elements.notice.hidden = false;
+          elements.notice.textContent = 'Could not clean up older saved data. Your aquarium data is still available.';
+        }
+      }
+      placementType = state.castleInventory > 0 ? 'castle' : state.seaweedInventory > 0 ? 'seaweed' : null;
+
+      let currentQuestion = null;
+      let currentSuperFoodQuestion = null;
+      let currentYummyFoodQuestion = null;
+      let noticeTimer = 0;
+      const developerConsoleLines = [
+        'Pool of problems developer console',
+        'Commands: buy 123 | buy NameHere, NameThere | kill NameHere | give NameHere 123 food | immortal NameHere true/false | add 123 coins | add 123 food | add 123 super food | add 123 yummy food | jump 123 | clear',
+        'Use _all_ in place of a fish name to target every fish.'
+      ];
+      elements.developerCommandOutput.textContent = developerConsoleLines.join('\n');
+
+      function showNotice(message) {
+        elements.notice.textContent = message;
+        elements.notice.hidden = false;
+        window.clearTimeout(noticeTimer);
+        noticeTimer = window.setTimeout(() => { elements.notice.hidden = true; }, 6500);
+      }
+
+      function save() {
+        try {
+          const activeAccount = accounts.find(account => account.id === activeAccountId);
+          if (activeAccount) activeAccount.save = state;
+          localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(accounts));
+          localStorage.setItem(ACTIVE_ACCOUNT_KEY, activeAccountId);
+          renderAccountMenu();
+        } catch (error) {
+          showNotice('Could not save your aquarium. Check your browser storage settings.');
+        }
+      }
+
+      function writeDeveloperConsole(message) {
+        developerConsoleLines.push(message);
+        if (developerConsoleLines.length > 24) developerConsoleLines.splice(0, developerConsoleLines.length - 24);
+        elements.developerCommandOutput.textContent = developerConsoleLines.join('\n');
+        elements.developerCommandOutput.scrollTop = elements.developerCommandOutput.scrollHeight;
+      }
+
+      function purchaseFish(names) {
+        if (!names.length || names.length > 500) {
+          writeDeveloperConsole('Buy between 1 and 500 fish at a time.');
+          return false;
+        }
+        const totalCost = names.length * FISH_COST;
+        if (!Number.isSafeInteger(totalCost) || state.coins < totalCost) {
+          writeDeveloperConsole(`Not enough coins. Buying ${names.length} fish costs ${totalCost} coins.`);
+          return false;
+        }
+
+        const newFish = names.map((name, index) => {
+          const look = fishLooks[Math.floor(Math.random() * fishLooks.length)];
+          const color = fishColors[(state.fishes.length + index) % fishColors.length];
+          return makeFish(name, look, color);
+        });
+        state.coins -= totalCost;
+        state.fishes.push(...newFish);
+        zeroFishPopupDismissed = false;
+        const arrivalFish = newFish.at(-1);
+        const greeting = fishGreetings[Math.floor(Math.random() * fishGreetings.length)]
+          .replaceAll('{name}', arrivalFish.name);
+        fishArrival = {
+          fishId: arrivalFish.id,
+          startedAt: null,
+          dropDuration: 1400,
+          totalDuration: 3800,
+          message: greeting
+        };
+        save();
+        render();
+        activateTab('aquarium');
+        resizeCanvas();
+        ensureFishMotion();
+        const motion = fishMotion.get(arrivalFish.id);
+        if (motion) {
+          motion.x = canvasWidth / 2;
+          motion.y = -45;
+          motion.vx = 0;
+          motion.vy = 0;
+        }
+        return true;
+      }
+
+      function executeDeveloperCommand(command) {
+        const text = command.trim();
+        if (!text) {
+          writeDeveloperConsole('Enter a command.');
+          return;
+        }
+        if (!state.developerUnlocked) {
+          writeDeveloperConsole('Developer mode is locked.');
+          return;
+        }
+        if (text.toLowerCase() === 'clear') {
+          developerConsoleLines.length = 0;
+          elements.developerCommandOutput.textContent = '';
+          return;
+        }
+
+        const immortalMatch = text.match(/^immortal\s+(.+?)\s+(true|false)$/i);
+        if (immortalMatch) {
+          const requestedName = immortalMatch[1].trim();
+          const immortal = immortalMatch[2].toLowerCase() === 'true';
+          const selectedFish = requestedName.toLowerCase() === '_all_'
+            ? [...state.fishes]
+            : state.fishes.filter(fish => fish.name.trim().toLowerCase() === requestedName.toLowerCase());
+          if (!selectedFish.length) {
+            writeDeveloperConsole(requestedName.toLowerCase() === '_all_'
+              ? 'There are no living fish to update.'
+              : `No living fish named "${requestedName}".`);
+            return;
+          }
+          if (requestedName.toLowerCase() !== '_all_' && selectedFish.length > 1) {
+            writeDeveloperConsole(`More than one fish is named "${requestedName}". Rename one first.`);
+            return;
+          }
+          selectedFish.forEach(fish => { fish.immortal = immortal; });
+          save();
+          render();
+          writeDeveloperConsole(requestedName.toLowerCase() === '_all_'
+            ? `Set ${selectedFish.length} fish immortal: ${immortal}.`
+            : `${selectedFish[0].name} immortality set to ${immortal}.`);
+          return;
+        }
+
+        const buyCountMatch = text.match(/^buy\s+(\d+)$/i);
+        if (buyCountMatch) {
+          const count = Number(buyCountMatch[1]);
+          if (!Number.isSafeInteger(count) || count < 1 || count > 500) {
+            writeDeveloperConsole('Buy between 1 and 500 fish at a time.');
+            return;
+          }
+          if (purchaseFish(Array(count).fill(null).map(() =>
+            fishNames[Math.floor(Math.random() * fishNames.length)]))) {
+            writeDeveloperConsole(`Bought ${count} fish for ${count * FISH_COST} coins.`);
+          }
+          return;
+        }
+
+        const buyNamesMatch = text.match(/^buy\s+(.+)$/i);
+        if (buyNamesMatch) {
+          const names = buyNamesMatch[1].split(',').map(name => name.trim());
+          if (names.some(name => !name || name.length > 20)) {
+            writeDeveloperConsole('Enter comma-separated fish names, each 1 to 20 characters long.');
+            return;
+          }
+          if (purchaseFish(names)) {
+            writeDeveloperConsole(`Bought ${names.length} fish: ${names.join(', ')}.`);
+          }
+          return;
+        }
+
+        const killMatch = text.match(/^kill\s+(.+)$/i);
+        if (killMatch) {
+          const requestedName = killMatch[1].trim();
+          const matchingFish = requestedName.toLowerCase() === '_all_'
+            ? [...state.fishes]
+            : state.fishes.filter(fish => fish.name.trim().toLowerCase() === requestedName.toLowerCase());
+          if (!matchingFish.length) {
+            writeDeveloperConsole(requestedName.toLowerCase() === '_all_'
+              ? 'There are no living fish to kill.'
+              : `No living fish named "${requestedName}".`);
+            return;
+          }
+          if (requestedName.toLowerCase() !== '_all_' && matchingFish.length > 1) {
+            writeDeveloperConsole(`More than one fish is named "${requestedName}". Rename one first.`);
+            return;
+          }
+          const protectedDevs = matchingFish.filter(fish => fish.name.trim().toLowerCase() === 'dev');
+          if (protectedDevs.length) {
+            const angryUntil = Date.now() + 24 * 60 * 60 * 1000;
+            protectedDevs.forEach(fish => { fish.devAngryUntil = angryUntil; });
+          }
+          const fishToKill = matchingFish.filter(fish => !protectedDevs.includes(fish));
+          if (fishToKill.length) {
+            const killedIds = new Set(fishToKill.map(fish => fish.id));
+            state.fishes = state.fishes.filter(fish => !killedIds.has(fish.id));
+            killedIds.forEach(id => fishMotion.delete(id));
+            if (fishArrival && killedIds.has(fishArrival.fishId)) fishArrival = null;
+          }
+          if (!fishToKill.length && protectedDevs.length === 1 && requestedName.toLowerCase() !== '_all_') {
+            save();
+            render();
+            writeDeveloperConsole('Note: You cannot kill the developer.\nWARNING: Dev is angry.');
+            return;
+          }
+          editorFishIds = '';
+          save();
+          render();
+          if (protectedDevs.length) {
+            writeDeveloperConsole(`Killed ${fishToKill.length} fish. Note: You cannot kill the developer.\nWARNING: Dev is angry.`);
+          } else {
+            writeDeveloperConsole(requestedName.toLowerCase() === '_all_'
+              ? `Killed ${fishToKill.length} fish.`
+              : `Killed ${fishToKill[0].name}.`);
+          }
+          return;
+        }
+
+        const giveMatch = text.match(/^give\s+(.+?)\s+(\d+)\s+food$/i);
+        if (giveMatch) {
+          const requestedName = giveMatch[1].trim();
+          const amount = Number(giveMatch[2]);
+          if (!Number.isSafeInteger(amount) || amount < 1) {
+            writeDeveloperConsole('Food amount must be a positive whole number.');
+            return;
+          }
+          const selectedFish = requestedName.toLowerCase() === '_all_'
+            ? [...state.fishes]
+            : state.fishes.filter(fish => fish.name.trim().toLowerCase() === requestedName.toLowerCase());
+          if (!selectedFish.length) {
+            writeDeveloperConsole(requestedName.toLowerCase() === '_all_'
+              ? 'There are no living fish to feed.'
+              : `No living fish named "${requestedName}".`);
+            return;
+          }
+          if (requestedName.toLowerCase() !== '_all_' && selectedFish.length > 1) {
+            writeDeveloperConsole(`More than one fish is named "${requestedName}". Rename one first.`);
+            return;
+          }
+          const fed = selectedFish.map(fish => {
+            const added = Math.min(amount, FOOD_QUOTA - fish.fed);
+            fish.fed += added;
+            return { fish, added };
+          });
+          const totalAdded = fed.reduce((total, result) => total + result.added, 0);
+          if (!totalAdded) {
+            writeDeveloperConsole(requestedName.toLowerCase() === '_all_'
+              ? 'All selected fish have reached their daily food quota.'
+              : `${selectedFish[0].name} has reached today’s food quota.`);
+            return;
+          }
+          save();
+          render();
+          if (selectedFish.length === 1) {
+            const { fish, added } = fed[0];
+            writeDeveloperConsole(`Gave ${added} food to ${fish.name} (${fish.fed}/${FOOD_QUOTA} today).`);
+          } else {
+            writeDeveloperConsole(`Gave up to ${amount} food to ${selectedFish.length} fish (${totalAdded} food total).`);
+          }
+          return;
+        }
+
+        const addMatch = text.match(/^add\s+(\d+)\s+(coins|food|super\s*food|yummy\s*food)$/i);
+        if (addMatch) {
+          const amount = Number(addMatch[1]);
+          if (!Number.isSafeInteger(amount) || amount < 1) {
+            writeDeveloperConsole('Amount must be a positive whole number.');
+            return;
+          }
+          const resource = addMatch[2].toLowerCase().replace(/\s+/g, '');
+          if (resource === 'coins') {
+            if (!Number.isSafeInteger(state.coins + amount)) {
+              writeDeveloperConsole('That coin amount is too large.');
+              return;
+            }
+            state.coins += amount;
+            save();
+            render();
+            writeDeveloperConsole(`Added ${amount} coins.`);
+            return;
+          }
+          const isRegularFood = resource === 'food';
+          const isSuperFood = resource === 'superfood';
+          const inventoryKey = isRegularFood ? 'food' : isSuperFood ? 'superFood' : 'yummyFood';
+          const cap = isRegularFood ? FOOD_CAP : isSuperFood ? SUPER_FOOD_CAP : YUMMY_FOOD_CAP;
+          const label = isRegularFood ? 'food' : isSuperFood ? 'super food' : 'yummy food';
+          const currentAmount = state[inventoryKey];
+          const added = Math.min(amount, cap - currentAmount);
+          if (!added) {
+            writeDeveloperConsole(`${label} ${isSuperFood ? 'flask' : 'jar'} is full (${cap}/${cap}).`);
+            return;
+          }
+          state[inventoryKey] += added;
+          save();
+          render();
+          writeDeveloperConsole(added === amount
+            ? `Added ${added} ${label}.`
+            : `Added ${added} ${label}; the ${isSuperFood ? 'flask' : 'jar'} is full at ${cap}/${cap}.`);
+          return;
+        }
+
+        const jumpMatch = text.match(/^jump\s+(\d+)$/i);
+        if (jumpMatch) {
+          const seconds = Number(jumpMatch[1]);
+          const targetTime = gameNow() + seconds * 1000;
+          if (!Number.isSafeInteger(seconds) || seconds < 1 ||
+            !Number.isSafeInteger(state.timeOffsetSeconds + seconds) ||
+            !Number.isFinite(targetTime) || Math.abs(targetTime) > 8.64e15) {
+            writeDeveloperConsole('Jump duration must be a positive number of seconds within the supported date range.');
+            return;
+          }
+          state.timeOffsetSeconds += seconds;
+          save();
+          render();
+          writeDeveloperConsole(`Skipped ${seconds} seconds.`);
+          return;
+        }
+
+        writeDeveloperConsole('Unknown command. Use buy 123, buy NameHere, NameThere, kill NameHere, give NameHere 123 food, immortal NameHere true/false, add 123 coins/food/super food/yummy food, jump 123, or clear.');
+      }
+
+      function renderAccountMenu() {
+        elements.accountOptions.replaceChildren();
+        const otherAccounts = accounts.filter(account => account.id !== activeAccountId);
+        const nameCounts = new Map();
+        accounts.forEach(account => {
+          const name = accountName(account);
+          nameCounts.set(name, (nameCounts.get(name) || 0) + 1);
+        });
+        otherAccounts.forEach(account => {
+          const button = document.createElement('button');
+          button.className = 'account-option';
+          button.type = 'button';
+          button.role = 'menuitem';
+          const name = accountName(account);
+          const duplicateSuffix = nameCounts.get(name) > 1
+            ? ` · account ${accounts.indexOf(account) + 1}`
+            : '';
+          button.textContent = `Switch to ${name}${duplicateSuffix}`;
+          button.addEventListener('click', () => switchAccount(account.id));
+          elements.accountOptions.append(button);
+        });
+      }
+
+      function closeAccountMenu() {
+        elements.accountMenu.hidden = true;
+        elements.accountTrigger.setAttribute('aria-expanded', 'false');
+      }
+
+      function createNewAccount() {
+        save();
+        state = newGame();
+        const newAccount = makeAccount(state);
+        accounts.push(newAccount);
+        activeAccountId = newAccount.id;
+        placementType = null;
+        decorationTarget = null;
+        fishArrival = null;
+        fishMotion.clear();
+        editorFishIds = '';
+        currentQuestion = null;
+        zeroFishPopupDismissed = false;
+        closeAccountMenu();
+        save();
+        render();
+        resizeCanvas();
+        if (!state.tutorialDone) openTutorial();
+      }
+
+      function switchAccount(accountId) {
+        const selected = accounts.find(account => account.id === accountId);
+        if (!selected || accountId === activeAccountId) {
+          closeAccountMenu();
+          return;
+        }
+        save();
+        state = normalizeSave(selected.save);
+        activeAccountId = selected.id;
+        fishArrival = null;
+        fishMotion.clear();
+        editorFishIds = '';
+        currentQuestion = null;
+        cursorTarget = null;
+        decorationTarget = null;
+        placementType = state.castleInventory > 0 ? 'castle' : state.seaweedInventory > 0 ? 'seaweed' : null;
+        zeroFishPopupDismissed = false;
+        closeAccountMenu();
+        save();
+        render();
+        resizeCanvas();
+        if (!state.tutorialDone) openTutorial();
+      }
+
+      save();
+
+      function updateCycle(now) {
+        let changed = false;
+        const today = localMidnight(now);
+        while (state.cycleStartedAt < today) {
+          const dueFishes = [...state.fishes];
+          const missed = dueFishes.filter(fish => fish.fed < FOOD_QUOTA);
+          if (missed.length) {
+            const died = missed.filter(fish => !fish.immortal);
+            const names = died.map(fish => fish.name).join(', ');
+            const spared = missed.filter(fish => fish.immortal);
+            state.fishes = state.fishes.filter(fish => fish.immortal || fish.fed >= FOOD_QUOTA);
+            state.streak = 0;
+            state.fishes.forEach(fish => { fish.fed = 0; });
+            if (died.length) {
+              const sparedMessage = spared.length ? ` ${spared.map(fish => fish.name).join(', ')} survived thanks to immortality.` : '';
+              showNotice(`${names} did not get 10 food and ${died.length === 1 ? 'has' : 'have'} died.${sparedMessage} Your streak has ended.`);
+            } else {
+              showNotice(`${spared.map(fish => fish.name).join(', ')} survived thanks to immortality, but the missed quota ended your streak.`);
+            }
+          } else if (dueFishes.length) {
+            state.streak += 1;
+            if (state.streak % 2 === 0) {
+              state.coins += 1;
+              showNotice(`Daily quota complete! Your ${state.streak}-day streak earned 1 Mathcoin.`);
+            } else {
+              showNotice(`Daily quota complete! Your ${state.streak}-day streak continues.`);
+            }
+            state.fishes.forEach(fish => { fish.fed = 0; });
+          } else {
+            state.streak = 0;
+          }
+          state.cycleStartedAt = nextLocalMidnight(state.cycleStartedAt);
+          changed = true;
+          if (!state.fishes.length) {
+            state.cycleStartedAt = today;
+            break;
+          }
+        }
+        if (changed) save();
+      }
+
+      function render() {
+        const now = gameNow();
+        updateCycle(now);
+        const noFishes = state.fishes.length === 0;
+        elements.zeroFishDialog.hidden = !noFishes || zeroFishPopupDismissed;
+        if (noFishes) {
+          if (state.coins >= FISH_COST) {
+            elements.zeroFishCopy.textContent = 'it looks like all your fishes have died... not to worry: just buy a new one! go on!';
+            elements.zeroFishAction.textContent = 'Go to the shop →';
+            elements.zeroFishAction.className = 'primary';
+          } else {
+            elements.zeroFishCopy.textContent = 'it looks like all your fishes have died... ...and you can’t buy a new one! just restart your progress.';
+            elements.zeroFishAction.textContent = 'Try again';
+            elements.zeroFishAction.className = 'try-again';
+          }
+        }
+        elements.foodCount.textContent = `${state.food} / ${FOOD_CAP}`;
+        elements.jarFill.style.height = `${(state.food / FOOD_CAP) * 100}%`;
+        elements.foodJar.disabled = state.food === 0;
+        elements.foodJar.title = state.food
+          ? `${state.food} food available. Drag one onto a fish to feed it.`
+          : 'The jar is empty. Earn food manually in the Shop.';
+        elements.superFoodCount.textContent = `${state.superFood} / ${SUPER_FOOD_CAP}`;
+        elements.superFoodFill.style.height = `${(state.superFood / SUPER_FOOD_CAP) * 100}%`;
+        elements.superFoodFlask.disabled = state.superFood === 0;
+        elements.superFoodFlask.title = state.superFood
+          ? `${state.superFood} super-food serving${state.superFood === 1 ? '' : 's'} available. Drag one onto a fish to restore 2 hunger.`
+          : 'The flask is empty. Solve a decimal-fraction question in the Shop.';
+        elements.yummyFoodCount.textContent = `${state.yummyFood} / ${YUMMY_FOOD_CAP}`;
+        elements.yummyFoodFill.style.height = `${(state.yummyFood / YUMMY_FOOD_CAP) * 100}%`;
+        elements.yummyFoodFlask.disabled = state.yummyFood === 0;
+        elements.yummyFoodFlask.title = state.yummyFood
+          ? `${state.yummyFood} yummy-food serving${state.yummyFood === 1 ? '' : 's'} available. Drag one onto a fish.`
+          : 'The yummy-food jar is empty. Solve an algebra question in the Shop.';
+        elements.coinCount.textContent = String(state.coins);
+        elements.streakCount.textContent = `${state.streak} day${state.streak === 1 ? '' : 's'}`;
+        elements.fishCount.textContent = `${state.fishes.length} fish`;
+        elements.fishRoster.replaceChildren();
+        for (const fish of state.fishes) {
+          const progress = document.createElement('span');
+          progress.className = 'roster-fish';
+          progress.textContent = `${fish.look} ${fish.name} · ${fish.fed}/${FOOD_QUOTA} today`;
+          elements.fishRoster.append(progress);
+        }
+        if (!state.fishes.length) elements.fishRoster.textContent = 'No fish yet. Visit the shop to welcome a new fish.';
+
+        const remaining = Math.max(0, nextLocalMidnight(now) - now);
+        foodThoughtsVisible = remaining < 12 * 60 * 60 * 1000;
+        const hours = Math.floor(remaining / 3600000);
+        const minutes = Math.floor((remaining % 3600000) / 60000);
+        const seconds = Math.floor((remaining % 60000) / 1000);
+        elements.deadlineCopy.innerHTML = `<strong>Quota resets at local midnight</strong> · ${hours}h ${minutes}m ${seconds}s`;
+        elements.buyFish.disabled = state.coins < FISH_COST;
+        elements.buySeaweed.disabled = state.coins < 2;
+        elements.buyCastle.disabled = state.coins < 5;
+        elements.buyFood.disabled = state.food >= FOOD_CAP;
+        elements.buySuperFood.disabled = state.superFood >= SUPER_FOOD_CAP;
+        elements.buyYummyFood.disabled = state.yummyFood >= YUMMY_FOOD_CAP;
+        elements.developerTools.hidden = !state.developerUnlocked;
+        elements.developerTrigger.textContent = state.developerUnlocked ? '🔓 Developer mode' : '🔒 Developer mode';
+        renderFishEditors();
+      }
+
+      let editorFishIds = '';
+      function renderFishEditors() {
+        const ids = state.fishes.map(fish => fish.id).join('|');
+        if (ids === editorFishIds) {
+          const nameInputs = elements.fishEditorList.querySelectorAll('.fish-editor input[type="text"]');
+          nameInputs.forEach((input, index) => {
+            const fish = state.fishes[index];
+            if (!fish) return;
+            const angry = fish.name.trim().toLowerCase() === 'dev' && fish.devAngryUntil > Date.now();
+            input.disabled = angry;
+            input.title = angry ? 'Dev is angry and cannot be renamed for 24 hours.' : '';
+          });
+          elements.fishEditorList.querySelectorAll('.fish-daily-progress').forEach((progress, index) => {
+            const fish = state.fishes[index];
+            if (fish) progress.textContent = `Today's care: ${fish.fed}/${FOOD_QUOTA} food`;
+          });
+          return;
+        }
+        editorFishIds = ids;
+        elements.fishEditorList.replaceChildren();
+        elements.noFishes.hidden = state.fishes.length > 0;
+        for (const fish of state.fishes) {
+          const card = document.createElement('article');
+          card.className = 'fish-editor';
+          const preview = document.createElement('div');
+          preview.className = 'editor-preview';
+          preview.textContent = fish.look;
+          const nameField = document.createElement('label');
+          nameField.className = 'field';
+          nameField.textContent = 'Name';
+          const nameInput = document.createElement('input');
+          nameInput.type = 'text';
+          nameInput.maxLength = 20;
+          nameInput.value = fish.name;
+          nameInput.required = true;
+          nameInput.setAttribute('aria-label', `Name for ${fish.name}`);
+          const devIsAngry = fish.name.trim().toLowerCase() === 'dev' && fish.devAngryUntil > Date.now();
+          nameInput.disabled = devIsAngry;
+          nameInput.title = devIsAngry ? 'Dev is angry and cannot be renamed for 24 hours.' : '';
+          nameField.append(nameInput);
+
+          const colorField = document.createElement('label');
+          colorField.className = 'field';
+          colorField.textContent = 'Color';
+          const colorInput = document.createElement('input');
+          colorInput.type = 'color';
+          colorInput.value = fish.color;
+          colorInput.setAttribute('aria-label', `Color for ${fish.name}`);
+          colorField.append(colorInput);
+
+          const shapeField = document.createElement('label');
+          shapeField.className = 'field';
+          shapeField.textContent = 'Shape';
+          const shapeSelect = document.createElement('select');
+          shapeSelect.setAttribute('aria-label', `Shape for ${fish.name}`);
+          fishShapes.forEach(shape => {
+            const option = document.createElement('option');
+            option.value = shape.value;
+            option.textContent = shape.label;
+            option.selected = shape.value === fish.shape;
+            shapeSelect.append(option);
+          });
+          shapeField.append(shapeSelect);
+
+          const progress = document.createElement('div');
+          progress.className = 'fish-daily-progress';
+          progress.textContent = `Today's care: ${fish.fed}/${FOOD_QUOTA} food`;
+          nameInput.addEventListener('input', () => {
+            if (fish.name.trim().toLowerCase() === 'dev' && fish.devAngryUntil > Date.now()) {
+              nameInput.value = fish.name;
+              return;
+            }
+            fish.name = nameInput.value.slice(0, 20);
+            save();
+          });
+          nameInput.addEventListener('blur', () => {
+            if (fish.name.trim().toLowerCase() === 'dev' && fish.devAngryUntil > Date.now()) {
+              nameInput.value = fish.name;
+              return;
+            }
+            if (!fish.name.trim()) {
+              fish.name = 'Fish';
+              nameInput.value = fish.name;
+              save();
+            }
+          });
+          colorInput.addEventListener('input', () => {
+            fish.color = colorInput.value;
+            save();
+          });
+          shapeSelect.addEventListener('change', () => {
+            fish.shape = shapeSelect.value;
+            save();
+          });
+          card.append(preview, nameField, colorField, shapeField, progress);
+          elements.fishEditorList.append(card);
+        }
+      }
+
+      function ensureFishMotion() {
+        state.fishes.forEach((fish, index) => {
+          if (fishMotion.has(fish.id)) return;
+          const fraction = (index + 1) / (state.fishes.length + 1);
+          fishMotion.set(fish.id, {
+            x: canvasWidth * (state.fishes.length === 1 ? 0.5 : 0.16 + fraction * 0.68),
+            y: canvasHeight * (0.38 + Math.random() * 0.28),
+            vx: (Math.random() < 0.5 ? -1 : 1) * (24 + Math.random() * 30),
+            vy: (Math.random() - 0.5) * 22,
+            turnIn: 1 + Math.random() * 2,
+            color: fish.color
+          });
+        });
+        for (const id of fishMotion.keys()) {
+          if (!state.fishes.some(fish => fish.id === id)) fishMotion.delete(id);
+        }
+      }
+
+      function resizeCanvas() {
+        const rect = elements.canvas.getBoundingClientRect();
+        if (!rect.width || !rect.height) return;
+        const oldWidth = canvasWidth;
+        const oldHeight = canvasHeight;
+        canvasWidth = rect.width;
+        canvasHeight = rect.height;
+        const pixelRatio = window.devicePixelRatio || 1;
+        elements.canvas.width = Math.round(canvasWidth * pixelRatio);
+        elements.canvas.height = Math.round(canvasHeight * pixelRatio);
+        canvasContext.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+        if (oldWidth && oldHeight) {
+          for (const motion of fishMotion.values()) {
+            motion.x *= canvasWidth / oldWidth;
+            motion.y *= canvasHeight / oldHeight;
+          }
+        }
+        ensureFishMotion();
+        if (tutorialTarget) positionTutorial();
+      }
+
+      function drawFish(fish, motion, showLabel, speechText = '') {
+        const direction = motion.vx < 0 ? -1 : 1;
+        const isDevFish = fish.name.trim().toLowerCase() === 'dev';
+        const isDevAngry = isDevFish && fish.devAngryUntil > Date.now();
+        const devDigitColor = isDevAngry ? '#ff344a' : '#42ff70';
+        const bodyColor = isDevFish ? '#050a08' : fish.color;
+        const radius = fish.shape === 'long' ? 27 : fish.shape === 'round' ? 34 : 29;
+        const bodyLength = fish.shape === 'long' ? 36 : fish.shape === 'round' ? 25 : fish.shape === 'angelfish' ? 24 : 30;
+        const bodyHeight = fish.shape === 'round' ? 25 : fish.shape === 'angelfish' ? 27 : fish.shape === 'long' ? 15 : 20;
+        canvasContext.save();
+        canvasContext.translate(motion.x, motion.y);
+        canvasContext.scale(direction, 1);
+        canvasContext.shadowColor = '#104b5b55';
+        canvasContext.shadowBlur = 7;
+        canvasContext.fillStyle = bodyColor;
+        canvasContext.beginPath();
+        if (fish.shape === 'angelfish') {
+          canvasContext.moveTo(-20, 0);
+          canvasContext.lineTo(-46, -25);
+          canvasContext.lineTo(-39, 0);
+          canvasContext.lineTo(-46, 25);
+          canvasContext.closePath();
+        } else {
+          canvasContext.moveTo(-20, 0);
+          canvasContext.lineTo(-43, -17);
+          canvasContext.quadraticCurveTo(-38, 0, -43, 17);
+          canvasContext.closePath();
+        }
+        canvasContext.fill();
+        canvasContext.shadowBlur = 0;
+        canvasContext.fillStyle = bodyColor;
+        canvasContext.beginPath();
+        canvasContext.ellipse(0, 0, bodyLength, bodyHeight, 0, 0, Math.PI * 2);
+        canvasContext.fill();
+        if (isDevFish) {
+          canvasContext.save();
+          canvasContext.beginPath();
+          canvasContext.ellipse(0, 0, bodyLength - 2, bodyHeight - 2, 0, 0, Math.PI * 2);
+          canvasContext.clip();
+          canvasContext.fillStyle = devDigitColor;
+          canvasContext.font = 'bold 9px monospace';
+          canvasContext.textAlign = 'center';
+          canvasContext.textBaseline = 'middle';
+          canvasContext.fillText('010101', 0, -9);
+          canvasContext.fillText('1010101', 0, 0);
+          canvasContext.fillText('010101', 0, 9);
+          canvasContext.restore();
+        } else {
+          canvasContext.fillStyle = '#ffffff55';
+          canvasContext.beginPath();
+          canvasContext.ellipse(4, -7, 13, 4, -0.1, 0, Math.PI * 2);
+          canvasContext.fill();
+        }
+        canvasContext.fillStyle = '#ffffff';
+        canvasContext.beginPath();
+        canvasContext.arc(17, -5, 4, 0, Math.PI * 2);
+        canvasContext.fill();
+        canvasContext.fillStyle = '#17354a';
+        canvasContext.beginPath();
+        canvasContext.arc(18, -5, 2, 0, Math.PI * 2);
+        canvasContext.fill();
+        if (isDevAngry) {
+          canvasContext.strokeStyle = '#ff344a';
+          canvasContext.lineWidth = 3;
+          canvasContext.lineCap = 'round';
+          canvasContext.beginPath();
+          canvasContext.moveTo(12, -13);
+          canvasContext.lineTo(20, -10);
+          canvasContext.stroke();
+        }
+        canvasContext.strokeStyle = isDevFish ? '#35d85a' : '#ffffff75';
+        canvasContext.lineWidth = 2;
+        canvasContext.beginPath();
+        canvasContext.moveTo(6, -15);
+        canvasContext.lineTo(5, 14);
+        canvasContext.moveTo(-5, -17);
+        canvasContext.lineTo(-7, 15);
+        canvasContext.stroke();
+        canvasContext.fillStyle = '#ffffff70';
+        canvasContext.beginPath();
+        canvasContext.moveTo(-1, 0);
+        canvasContext.quadraticCurveTo(0, 13, 11, 13);
+        canvasContext.quadraticCurveTo(6, 4, -1, 0);
+        canvasContext.fill();
+        if (fish.shape === 'angelfish') {
+          canvasContext.strokeStyle = '#315e78';
+          canvasContext.lineWidth = 2.5;
+          canvasContext.lineCap = 'round';
+          canvasContext.beginPath();
+          canvasContext.moveTo(18, -14);
+          canvasContext.quadraticCurveTo(20, -31, 31, -32);
+          canvasContext.stroke();
+          const glow = canvasContext.createRadialGradient(31, -36, 2, 31, -36, 17);
+          glow.addColorStop(0, '#fffde0');
+          glow.addColorStop(0.24, '#fff176');
+          glow.addColorStop(1, '#ffd43b00');
+          canvasContext.fillStyle = glow;
+          canvasContext.beginPath();
+          canvasContext.arc(31, -36, 17, 0, Math.PI * 2);
+          canvasContext.fill();
+          canvasContext.fillStyle = '#ffe45e';
+          canvasContext.strokeStyle = '#fff8c6';
+          canvasContext.lineWidth = 1.5;
+          canvasContext.beginPath();
+          canvasContext.arc(31, -36, 6, 0, Math.PI * 2);
+          canvasContext.fill();
+          canvasContext.stroke();
+        }
+        canvasContext.restore();
+
+        if (showLabel) {
+          canvasContext.textAlign = 'center';
+          canvasContext.font = '700 13px system-ui, sans-serif';
+          canvasContext.fillStyle = '#16475a';
+          canvasContext.fillText(fish.name, motion.x, motion.y - radius - 16);
+          canvasContext.font = '700 11px system-ui, sans-serif';
+          canvasContext.fillStyle = '#245c6b';
+          canvasContext.fillText(`${fish.fed}/${FOOD_QUOTA} today`, motion.x, motion.y - radius - 2);
+        }
+
+        if (speechText) {
+          drawSpeechBubble(speechText, motion.x, motion.y - bodyHeight - 7);
+        }
+
+        if (foodThoughtsVisible && fish.fed < FOOD_QUOTA) {
+          const side = motion.x < canvasWidth - 95 ? 1 : -1;
+          const bubbleX = motion.x + side * 43;
+          const bubbleY = Math.max(20, motion.y - 45);
+          canvasContext.save();
+          canvasContext.fillStyle = '#ffffff';
+          canvasContext.strokeStyle = '#287487';
+          canvasContext.lineWidth = 2;
+          canvasContext.beginPath();
+          canvasContext.arc(motion.x + side * 27, motion.y - 22, 3, 0, Math.PI * 2);
+          canvasContext.arc(motion.x + side * 34, motion.y - 33, 4, 0, Math.PI * 2);
+          canvasContext.fill();
+          canvasContext.stroke();
+          canvasContext.beginPath();
+          canvasContext.ellipse(bubbleX, bubbleY, 22, 16, 0, 0, Math.PI * 2);
+          canvasContext.fill();
+          canvasContext.stroke();
+          canvasContext.font = '17px system-ui, sans-serif';
+          canvasContext.textAlign = 'center';
+          canvasContext.textBaseline = 'middle';
+          canvasContext.fillText('🍤', bubbleX, bubbleY + 1);
+          canvasContext.restore();
+        }
+      }
+
+      function drawSpeechBubble(text, targetX, targetY) {
+        canvasContext.save();
+        canvasContext.font = '700 13px system-ui, sans-serif';
+        const maxWidth = Math.min(300, canvasWidth - 32);
+        const words = text.split(/\s+/);
+        const lines = [];
+        let line = '';
+        for (const word of words) {
+          const candidate = line ? `${line} ${word}` : word;
+          if (line && canvasContext.measureText(candidate).width > maxWidth - 24) {
+            lines.push(line);
+            line = word;
+          } else {
+            line = candidate;
+          }
+        }
+        if (line) lines.push(line);
+        const bubbleWidth = Math.min(maxWidth, Math.max(100, ...lines.map(item => canvasContext.measureText(item).width + 24)));
+        const bubbleHeight = lines.length * 18 + 20;
+        const x = Math.max(8, Math.min(canvasWidth - bubbleWidth - 8, targetX - bubbleWidth / 2));
+        const y = Math.max(8, targetY - bubbleHeight - 13);
+        const tailX = Math.max(x + 15, Math.min(x + bubbleWidth - 15, targetX));
+
+        canvasContext.fillStyle = '#fff';
+        canvasContext.strokeStyle = '#287487';
+        canvasContext.lineWidth = 2;
+        canvasContext.beginPath();
+        canvasContext.moveTo(tailX - 8, y + bubbleHeight - 1);
+        canvasContext.lineTo(tailX, y + bubbleHeight + 10);
+        canvasContext.lineTo(tailX + 7, y + bubbleHeight - 1);
+        canvasContext.closePath();
+        canvasContext.fill();
+        canvasContext.stroke();
+        canvasContext.beginPath();
+        canvasContext.moveTo(x + 11, y);
+        canvasContext.lineTo(x + bubbleWidth - 11, y);
+        canvasContext.quadraticCurveTo(x + bubbleWidth, y, x + bubbleWidth, y + 11);
+        canvasContext.lineTo(x + bubbleWidth, y + bubbleHeight - 11);
+        canvasContext.quadraticCurveTo(x + bubbleWidth, y + bubbleHeight, x + bubbleWidth - 11, y + bubbleHeight);
+        canvasContext.lineTo(x + 11, y + bubbleHeight);
+        canvasContext.quadraticCurveTo(x, y + bubbleHeight, x, y + bubbleHeight - 11);
+        canvasContext.lineTo(x, y + 11);
+        canvasContext.quadraticCurveTo(x, y, x + 11, y);
+        canvasContext.closePath();
+        canvasContext.fill();
+        canvasContext.stroke();
+        canvasContext.fillStyle = '#17354a';
+        canvasContext.textAlign = 'center';
+        canvasContext.textBaseline = 'middle';
+        lines.forEach((item, index) => {
+          canvasContext.fillText(item, x + bubbleWidth / 2, y + 10 + index * 18 + 9, bubbleWidth - 20);
+        });
+        canvasContext.restore();
+      }
+
+      function drawSeaweed(x, baseY, timestamp, alpha = 1, seed = 0) {
+        canvasContext.save();
+        canvasContext.globalAlpha = alpha;
+        canvasContext.translate(x, baseY);
+        canvasContext.scale(2, 2);
+        canvasContext.strokeStyle = '#268c62';
+        canvasContext.fillStyle = '#36a975';
+        canvasContext.lineWidth = 7;
+        canvasContext.lineCap = 'round';
+        for (let stem = -1; stem <= 1; stem++) {
+          const sway = Math.sin(timestamp / 850 + seed + stem) * 5;
+          const height = 45 + ((seed + stem + 3) % 3) * 10;
+          canvasContext.beginPath();
+          canvasContext.moveTo(stem * 7, 0);
+          canvasContext.quadraticCurveTo(
+            stem * 12 + sway,
+            -height * 0.55,
+            stem * 8 + sway,
+            -height
+          );
+          canvasContext.stroke();
+          for (let leaf = 0; leaf < 3; leaf++) {
+            const leafY = -height * (0.28 + leaf * 0.22);
+            const side = (leaf + stem) % 2 ? 1 : -1;
+            const leafX = stem * 9 + sway * (leaf / 3);
+            canvasContext.beginPath();
+            canvasContext.ellipse(leafX + side * 9, leafY, 10, 4, side * -0.35, 0, Math.PI * 2);
+            canvasContext.fill();
+          }
+        }
+        canvasContext.restore();
+      }
+
+      function drawCastle(x, baseY, alpha = 1, scale = 2) {
+        canvasContext.save();
+        canvasContext.globalAlpha = alpha;
+        canvasContext.translate(x, baseY);
+        canvasContext.scale(scale, scale);
+        canvasContext.lineWidth = 2;
+        canvasContext.strokeStyle = '#756b61';
+        canvasContext.fillStyle = '#a99f91';
+        canvasContext.fillRect(-34, -48, 68, 48);
+        canvasContext.strokeRect(-34, -48, 68, 48);
+        canvasContext.fillStyle = '#c0b7a7';
+        canvasContext.fillRect(-27, -70, 20, 22);
+        canvasContext.strokeRect(-27, -70, 20, 22);
+        canvasContext.fillRect(7, -70, 20, 22);
+        canvasContext.strokeRect(7, -70, 20, 22);
+        canvasContext.fillStyle = '#8e8478';
+        for (let crenel = -3; crenel <= 2; crenel++) {
+          canvasContext.fillRect(crenel * 11, -55, 7, 9);
+        }
+        canvasContext.fillStyle = '#55666a';
+        canvasContext.fillRect(-18, -35, 9, 13);
+        canvasContext.fillRect(9, -35, 9, 13);
+        canvasContext.fillStyle = '#655448';
+        canvasContext.beginPath();
+        canvasContext.moveTo(-8, 0);
+        canvasContext.lineTo(-8, -19);
+        canvasContext.quadraticCurveTo(0, -29, 8, -19);
+        canvasContext.lineTo(8, 0);
+        canvasContext.closePath();
+        canvasContext.fill();
+        canvasContext.stroke();
+        canvasContext.restore();
+      }
+
+      function drawAquarium(timestamp) {
+        const dt = Math.min((timestamp - lastFrame) / 1000 || 0, 0.04);
+        lastFrame = timestamp;
+        ensureFishMotion();
+
+        const gradient = canvasContext.createLinearGradient(0, 0, 0, canvasHeight);
+        gradient.addColorStop(0, '#a5e8e9');
+        gradient.addColorStop(0.58, '#58bfd1');
+        gradient.addColorStop(1, '#1689a5');
+        canvasContext.fillStyle = gradient;
+        canvasContext.fillRect(0, 0, canvasWidth, canvasHeight);
+
+        canvasContext.save();
+        canvasContext.globalAlpha = 0.22;
+        for (let i = 0; i < 5; i++) {
+          const x = (canvasWidth * (i + 0.5)) / 5;
+          canvasContext.fillStyle = '#ffffff';
+          canvasContext.beginPath();
+          canvasContext.moveTo(x - 15, 0);
+          canvasContext.lineTo(x + 5, 0);
+          canvasContext.lineTo(x + 90 + Math.sin(timestamp / 1700 + i) * 20, canvasHeight * 0.72);
+          canvasContext.lineTo(x - 55 + Math.sin(timestamp / 1800 + i) * 18, canvasHeight * 0.72);
+          canvasContext.closePath();
+          canvasContext.fill();
+        }
+        canvasContext.restore();
+
+        for (let i = 0; i < 12; i++) {
+          const x = ((i * 97 + 26) % canvasWidth);
+          const rise = (timestamp * (0.012 + (i % 3) * 0.004) + i * 43) % canvasHeight;
+          canvasContext.strokeStyle = '#ffffff70';
+          canvasContext.lineWidth = 2;
+          canvasContext.beginPath();
+          canvasContext.arc(x + Math.sin(timestamp / 950 + i) * 8, canvasHeight - rise, 3 + (i % 3), 0, Math.PI * 2);
+          canvasContext.stroke();
+        }
+
+        const sandHeight = 35;
+        canvasContext.fillStyle = '#f2d78f';
+        canvasContext.fillRect(0, canvasHeight - sandHeight, canvasWidth, sandHeight);
+        canvasContext.fillStyle = '#e8c979';
+        canvasContext.fillRect(0, canvasHeight - sandHeight, canvasWidth, 5);
+        for (let i = 0; i < 20; i++) {
+          canvasContext.fillStyle = i % 2 ? '#d2b36b' : '#f9e6ae';
+          canvasContext.beginPath();
+          canvasContext.ellipse((i * 61 + 17) % canvasWidth, canvasHeight - 13 - (i % 3) * 5, 4, 2, 0, 0, Math.PI * 2);
+          canvasContext.fill();
+        }
+
+        for (const side of [0, 1]) {
+          const baseX = side ? canvasWidth - 42 : 42;
+          canvasContext.strokeStyle = '#25875f';
+          canvasContext.lineWidth = 9;
+          canvasContext.lineCap = 'round';
+          for (let leaf = 0; leaf < 4; leaf++) {
+            canvasContext.beginPath();
+            canvasContext.moveTo(baseX, canvasHeight - sandHeight);
+            canvasContext.quadraticCurveTo(baseX + (side ? -25 : 25) + Math.sin(timestamp / 700 + leaf) * 5, canvasHeight - 85 - leaf * 15, baseX + (side ? -16 : 16), canvasHeight - 135 - leaf * 12);
+            canvasContext.stroke();
+          }
+        }
+
+        state.seaweed.forEach((plant, index) => {
+          const baseY = plant.y === undefined
+            ? canvasHeight - sandHeight
+            : plant.y * canvasHeight;
+          drawSeaweed(plant.x * canvasWidth, baseY, timestamp, 1, index + 1);
+        });
+        state.castles.forEach(castle => {
+          const baseY = castle.y === undefined ? canvasHeight - sandHeight : castle.y * canvasHeight;
+          drawCastle(castle.x * canvasWidth, baseY, 1, castle.scale);
+        });
+        if (placementType && decorationTarget !== null) {
+          if (placementType === 'castle') drawCastle(decorationTarget.x, decorationTarget.y, 0.42, castlePlacementScale);
+          else drawSeaweed(decorationTarget.x, decorationTarget.y, timestamp, 0.42, state.seaweed.length + 1);
+        }
+
+        const hoveredFish = cursorTarget ? findFishAt(cursorTarget.x, cursorTarget.y) : null;
+        for (const fish of state.fishes) {
+          const motion = fishMotion.get(fish.id);
+          if (!motion) continue;
+          const isArriving = fishArrival?.fishId === fish.id;
+          if (isArriving && fishArrival.startedAt === null) {
+            fishArrival.startedAt = timestamp;
+            fishArrival.startX = canvasWidth * 0.5;
+            fishArrival.startY = -45;
+            fishArrival.targetX = canvasWidth * 0.5;
+            fishArrival.targetY = canvasHeight * 0.48;
+          }
+          const arrivalElapsed = isArriving ? timestamp - fishArrival.startedAt : Infinity;
+          if (isArriving && arrivalElapsed < fishArrival.dropDuration) {
+            const progress = Math.max(0, arrivalElapsed / fishArrival.dropDuration);
+            const eased = 1 - Math.pow(1 - progress, 3) + Math.sin(progress * Math.PI * 3) * (1 - progress) * 0.055;
+            motion.x = fishArrival.startX + (fishArrival.targetX - fishArrival.startX) * progress;
+            motion.y = fishArrival.startY + (fishArrival.targetY - fishArrival.startY) * Math.max(0, Math.min(1.04, eased));
+            motion.vx = progress < 1 ? 0 : motion.vx;
+            motion.vy = 0;
+          } else {
+            if (cursorTarget) {
+              const dx = cursorTarget.x - motion.x;
+              const dy = cursorTarget.y - motion.y;
+              const distance = Math.hypot(dx, dy);
+              const speed = Math.min(115, distance * 1.8);
+              const desiredVx = distance ? (dx / distance) * speed : 0;
+              const desiredVy = distance ? (dy / distance) * speed : 0;
+              motion.vx += (desiredVx - motion.vx) * Math.min(1, dt * 2.4);
+              motion.vy += (desiredVy - motion.vy) * Math.min(1, dt * 2.4);
+            } else {
+              motion.turnIn -= dt;
+              if (motion.turnIn <= 0) {
+                motion.vx = Math.sign(motion.vx || 1) * (22 + Math.random() * 32);
+                motion.vy = (Math.random() - 0.5) * 36;
+                motion.turnIn = 1.2 + Math.random() * 2.8;
+              }
+            }
+            motion.x += motion.vx * dt;
+            motion.y += motion.vy * dt;
+            if (motion.x < 55 || motion.x > canvasWidth - 55) motion.vx *= -1;
+            const bottomLimit = canvasHeight - sandHeight - fishVerticalExtent(fish);
+            if (motion.y < 62 || motion.y > bottomLimit) motion.vy *= -1;
+            motion.x = Math.max(55, Math.min(canvasWidth - 55, motion.x));
+            motion.y = Math.max(62, Math.min(bottomLimit, motion.y));
+          }
+          const greetingVisible = isArriving && arrivalElapsed < fishArrival.totalDuration;
+          drawFish(fish, motion, fish.id === hoveredFish?.id, greetingVisible ? fishArrival.message : '');
+          if (isArriving && arrivalElapsed >= fishArrival.totalDuration) fishArrival = null;
+          if (draggingFood && dragPointer && fish.fed < FOOD_QUOTA) {
+            const rect = elements.canvas.getBoundingClientRect();
+            const dragX = dragPointer.x - rect.left;
+            const dragY = dragPointer.y - rect.top;
+            if (findFishAt(dragX, dragY)?.id === fish.id) {
+              canvasContext.strokeStyle = '#ffe17a';
+              canvasContext.lineWidth = 4;
+              canvasContext.beginPath();
+              canvasContext.ellipse(motion.x, motion.y, 46, fishVerticalExtent(fish), 0, 0, Math.PI * 2);
+              canvasContext.stroke();
+            }
+          }
+        }
+        if (draggingFood && dragPointer) {
+          const rect = elements.canvas.getBoundingClientRect();
+          const x = dragPointer.x - rect.left;
+          const y = dragPointer.y - rect.top;
+          if (x >= 0 && x <= rect.width && y >= 0 && y <= rect.height) {
+            canvasContext.font = '24px system-ui, sans-serif';
+            canvasContext.textAlign = 'center';
+            canvasContext.textBaseline = 'middle';
+            const foodEmoji = draggingFood === 'super' ? '🧪' : draggingFood === 'yummy' ? '🍬' : '🍤';
+            canvasContext.save();
+            canvasContext.filter = draggingFood === 'super'
+              ? 'hue-rotate(145deg) saturate(1.5)'
+              : draggingFood === 'yummy' ? 'hue-rotate(300deg) saturate(1.4)' : 'none';
+            canvasContext.fillText(foodEmoji, x, y);
+            canvasContext.restore();
+          }
+        }
+        requestAnimationFrame(drawAquarium);
+      }
+
+      function feedFish(id, foodType = 'regular') {
+        const fish = state.fishes.find(item => item.id === id);
+        if (!fish) return;
+        const inventory = foodType === 'super'
+          ? state.superFood
+          : foodType === 'yummy' ? state.yummyFood : state.food;
+        if (inventory < 1) {
+          const emptyMessage = foodType === 'super'
+            ? 'Your super-food flask is empty. Solve a decimal-fraction question in the Shop.'
+            : foodType === 'yummy'
+              ? 'Your yummy-food jar is empty. Solve an algebra question in the Shop.'
+              : 'Your jar is empty. Wait for it to refill or answer a math question in the shop.';
+          showNotice(emptyMessage);
+          return;
+        }
+        if (fish.fed >= FOOD_QUOTA) {
+          showNotice(`${fish.name} has already reached today’s 10-food quota.`);
+          return;
+        }
+        const previousFed = fish.fed;
+        let hungerAdded = 1;
+        if (foodType === 'super') {
+          state.superFood -= 1;
+          hungerAdded = 2;
+        } else if (foodType === 'yummy') {
+          state.yummyFood -= 1;
+          if (Math.random() < 1 / 3) hungerAdded = 2;
+        } else {
+          state.food -= 1;
+        }
+        fish.fed = Math.min(FOOD_QUOTA, fish.fed + hungerAdded);
+        const actualAdded = fish.fed - previousFed;
+        save();
+        render();
+        const foodLabel = foodType === 'super' ? 'super food' : foodType === 'yummy' ? 'yummy food' : 'a tasty snack';
+        const resultLabel = foodType === 'yummy'
+          ? ` It restored ${actualAdded} food.`
+          : '';
+        showNotice(`${fish.name} enjoyed ${foodLabel}!${resultLabel} ${fish.fed}/${FOOD_QUOTA} food today.`);
+      }
+
+      function makeQuestion() {
+        const operations = ['+', '−', '×', '÷'];
+        const operation = operations[Math.floor(Math.random() * operations.length)];
+        let a = Math.floor(Math.random() * 12) + 2;
+        let b = Math.floor(Math.random() * 10) + 1;
+        let answer;
+        if (operation === '+') answer = a + b;
+        if (operation === '−') {
+          if (a < b) [a, b] = [b, a];
+          answer = a - b;
+        }
+        if (operation === '×') answer = a * b;
+        if (operation === '÷') {
+          answer = a;
+          a = a * b;
+        }
+        return { text: `${a} ${operation} ${b} = ?`, answer };
+      }
+
+      function makeSuperFoodQuestion() {
+        const operations = ['+', '−', '×', '÷'];
+        const operation = operations[Math.floor(Math.random() * operations.length)];
+        let aTenths = Math.floor(Math.random() * 90) + 1;
+        let bTenths = Math.floor(Math.random() * 90) + 1;
+        let answer;
+        if (operation === '+') answer = (aTenths + bTenths) / 10;
+        if (operation === '−') {
+          if (aTenths < bTenths) [aTenths, bTenths] = [bTenths, aTenths];
+          answer = (aTenths - bTenths) / 10;
+        }
+        if (operation === '×') answer = (aTenths * bTenths) / 100;
+        if (operation === '÷') {
+          const answerTenths = (Math.floor(Math.random() * 20) + 1) * 2;
+          bTenths = 5;
+          aTenths = answerTenths / 2;
+          answer = answerTenths / 10;
+        }
+        return {
+          text: `${(aTenths / 10).toFixed(1)} ${operation} ${(bTenths / 10).toFixed(1)} = ?`,
+          answer
+        };
+      }
+
+      function makeYummyFoodQuestion() {
+        const operation = ['+', '−', '×', '÷'][Math.floor(Math.random() * 4)];
+        const missingNumber = Math.floor(Math.random() * 19) + 2;
+        const otherNumber = Math.floor(Math.random() * 11) + 2;
+        let left;
+        let right;
+        let result;
+        let answer;
+        const missingIsLeft = Math.random() < 0.5;
+        if (operation === '+') {
+          [left, right, result, answer] = missingIsLeft
+            ? ['?', otherNumber, missingNumber + otherNumber, missingNumber]
+            : [missingNumber, otherNumber, '?', missingNumber + otherNumber];
+        } else if (operation === '−') {
+          [left, right, result, answer] = missingIsLeft
+            ? ['?', otherNumber, missingNumber - otherNumber, missingNumber]
+            : [missingNumber, otherNumber, '?', missingNumber - otherNumber];
+        } else if (operation === '×') {
+          [left, right, result, answer] = missingIsLeft
+            ? ['?', otherNumber, missingNumber * otherNumber, missingNumber]
+            : [missingNumber, otherNumber, '?', missingNumber * otherNumber];
+        } else {
+          [left, right, result, answer] = missingIsLeft
+            ? ['?', otherNumber, missingNumber, missingNumber * otherNumber]
+            : [missingNumber * otherNumber, otherNumber, '?', missingNumber];
+        }
+        return { text: `${left} ${operation} ${right} = ${result}`, answer };
+      }
+
+      function openFoodQuestion() {
+        if (!currentQuestion) currentQuestion = makeQuestion();
+        elements.mathQuestion.textContent = currentQuestion.text;
+        elements.mathFeedback.textContent = '';
+        elements.mathFeedback.className = 'feedback';
+        elements.mathBox.hidden = false;
+        elements.mathAnswer.value = '';
+        elements.mathAnswer.focus();
+      }
+
+      function openSuperFoodQuestion() {
+        if (state.superFood >= SUPER_FOOD_CAP) {
+          showNotice('Your super-food flask is full.');
+          return;
+        }
+        currentSuperFoodQuestion = makeSuperFoodQuestion();
+        elements.superFoodMathQuestion.textContent = currentSuperFoodQuestion.text;
+        elements.superFoodMathFeedback.textContent = '';
+        elements.superFoodMathFeedback.className = 'feedback';
+        elements.superFoodMathBox.hidden = false;
+        elements.superFoodMathAnswer.value = '';
+        elements.superFoodMathAnswer.focus();
+      }
+
+      function openYummyFoodQuestion() {
+        if (state.yummyFood >= YUMMY_FOOD_CAP) {
+          showNotice('Your yummy-food jar is full.');
+          return;
+        }
+        currentYummyFoodQuestion = makeYummyFoodQuestion();
+        elements.yummyFoodMathQuestion.textContent = currentYummyFoodQuestion.text;
+        elements.yummyFoodMathFeedback.textContent = '';
+        elements.yummyFoodMathFeedback.className = 'feedback';
+        elements.yummyFoodMathBox.hidden = false;
+        elements.yummyFoodMathAnswer.value = '';
+        elements.yummyFoodMathAnswer.focus();
+      }
+
+      elements.aquariumTab.addEventListener('click', () => {
+        activateTab('aquarium');
+      });
+      elements.shopTab.addEventListener('click', () => {
+        activateTab('shop');
+      });
+      elements.fishesTab.addEventListener('click', () => {
+        activateTab('fishes');
+      });
+      elements.otherTab.addEventListener('click', () => {
+        activateTab('other');
+      });
+      elements.buyFood.addEventListener('click', openFoodQuestion);
+      elements.buySuperFood.addEventListener('click', openSuperFoodQuestion);
+      elements.buyYummyFood.addEventListener('click', openYummyFoodQuestion);
+      elements.answerForm.addEventListener('submit', event => {
+        event.preventDefault();
+        if (!currentQuestion) return;
+        const answer = Number(elements.mathAnswer.value);
+        if (!Number.isFinite(answer) || answer !== currentQuestion.answer) {
+          elements.mathFeedback.textContent = 'Not quite — try again!';
+          elements.mathFeedback.className = 'feedback error';
+          elements.mathAnswer.select();
+          return;
+        }
+        if (state.food >= FOOD_CAP) {
+          currentQuestion = null;
+          elements.mathBox.hidden = true;
+          showNotice('Your food jar is full. Wait until you have room before earning more food.');
+          return;
+        }
+        state.food += 1;
+        save();
+        currentQuestion = null;
+        elements.mathBox.hidden = true;
+        render();
+        showNotice('Correct! 1 food added to your aquarium.');
+      });
+      elements.superFoodAnswerForm.addEventListener('submit', event => {
+        event.preventDefault();
+        if (!currentSuperFoodQuestion) return;
+        const answer = Number(elements.superFoodMathAnswer.value);
+        if (!Number.isFinite(answer) || Math.abs(answer - currentSuperFoodQuestion.answer) > 1e-8) {
+          elements.superFoodMathFeedback.textContent = 'Not quite — try again!';
+          elements.superFoodMathFeedback.className = 'feedback error';
+          elements.superFoodMathAnswer.select();
+          return;
+        }
+        if (state.superFood >= SUPER_FOOD_CAP) {
+          currentSuperFoodQuestion = null;
+          elements.superFoodMathBox.hidden = true;
+          showNotice('Your super-food flask is full. Use some before earning more.');
+          return;
+        }
+        state.superFood += 1;
+        save();
+        currentSuperFoodQuestion = null;
+        elements.superFoodMathBox.hidden = true;
+        render();
+        showNotice('Correct! 1 super-food serving added to your flask.');
+      });
+      elements.yummyFoodAnswerForm.addEventListener('submit', event => {
+        event.preventDefault();
+        if (!currentYummyFoodQuestion) return;
+        const answer = Number(elements.yummyFoodMathAnswer.value);
+        if (!Number.isSafeInteger(answer) || answer !== currentYummyFoodQuestion.answer) {
+          elements.yummyFoodMathFeedback.textContent = 'Not quite — try again!';
+          elements.yummyFoodMathFeedback.className = 'feedback error';
+          elements.yummyFoodMathAnswer.select();
+          return;
+        }
+        if (state.yummyFood >= YUMMY_FOOD_CAP) {
+          currentYummyFoodQuestion = null;
+          elements.yummyFoodMathBox.hidden = true;
+          showNotice('Your yummy-food jar is full. Use some before earning more.');
+          return;
+        }
+        state.yummyFood += 1;
+        save();
+        currentYummyFoodQuestion = null;
+        elements.yummyFoodMathBox.hidden = true;
+        render();
+        showNotice('Correct! 1 yummy-food serving added to your jar.');
+      });
+      elements.buyFish.addEventListener('click', () => {
+        if (state.coins < FISH_COST) return;
+        const name = fishNames[Math.floor(Math.random() * fishNames.length)];
+        purchaseFish([name]);
+      });
+      elements.buySeaweed.addEventListener('click', () => {
+        if (state.coins < 2) return;
+        state.coins -= 2;
+        state.seaweedInventory += 1;
+        placementType = 'seaweed';
+        decorationTarget = null;
+        save();
+        render();
+        activateTab('aquarium');
+        showNotice('Seaweed ready! Move over the aquarium to preview it, then click to place.');
+      });
+      elements.buyCastle.addEventListener('click', () => {
+        if (state.coins < 5) return;
+        state.coins -= 5;
+        state.castleInventory += 1;
+        placementType = 'castle';
+        castlePlacementScale = 2;
+        decorationTarget = null;
+        save();
+        render();
+        activateTab('aquarium');
+        showNotice('Stone castle ready! Move to preview it, then press E to enlarge or Q to shrink before placing.');
+      });
+
+      function getCanvasPointer(event) {
+        const rect = elements.canvas.getBoundingClientRect();
+        return { x: event.clientX - rect.left, y: event.clientY - rect.top, rect };
+      }
+
+      function fishVerticalExtent(fish) {
+        if (fish.shape === 'round') return 25;
+        if (fish.shape === 'long') return 17;
+        if (fish.shape === 'angelfish') return 27;
+        return 20;
+      }
+
+      function findFishAt(x, y) {
+        let selected = null;
+        let closest = Infinity;
+        for (const fish of state.fishes) {
+          const motion = fishMotion.get(fish.id);
+          if (!motion) continue;
+          const horizontalDistance = (x - motion.x) / 46;
+          const verticalDistance = (y - motion.y) / fishVerticalExtent(fish);
+          const normalizedDistance = horizontalDistance ** 2 + verticalDistance ** 2;
+          if (normalizedDistance <= 1 && normalizedDistance < closest) {
+            closest = normalizedDistance;
+            selected = fish;
+          }
+        }
+        return selected;
+      }
+
+      function findCastleAt(x, y) {
+        return [...state.castles].reverse().find(castle => {
+          const scale = Number.isFinite(castle.scale) ? castle.scale : 2;
+          const centerX = castle.x * canvasWidth;
+          const baseY = castle.y === undefined ? canvasHeight - 35 : castle.y * canvasHeight;
+          return x >= centerX - 36 * scale && x <= centerX + 36 * scale &&
+            y >= baseY - 72 * scale && y <= baseY;
+        });
+      }
+
+      function resizeCastle(direction, x, y) {
+        const castle = placementType === 'castle' ? null : findCastleAt(x, y);
+        if (placementType !== 'castle' && !castle) return false;
+        if (castle) {
+          castle.scale = Math.max(0.5, Math.min(4, (castle.scale ?? 2) + direction * 0.25));
+          save();
+        } else {
+          castlePlacementScale = Math.max(0.5, Math.min(4, castlePlacementScale + direction * 0.25));
+        }
+        showNotice(`Stone castle size: ${castle ? castle.scale : castlePlacementScale}×`);
+        return true;
+      }
+
+      document.addEventListener('keydown', event => {
+        const key = event.key.toLowerCase();
+        if (key !== 'q' && key !== 'e') return;
+        if (event.target instanceof HTMLElement &&
+          (event.target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(event.target.tagName))) return;
+        if (!resizePointerTarget) return;
+        const { x, y } = resizePointerTarget;
+        if (!resizeCastle(key === 'e' ? 1 : -1, x, y)) return;
+        event.preventDefault();
+      });
+
+      elements.canvas.addEventListener('pointermove', event => {
+        const { x, y, rect } = getCanvasPointer(event);
+        const inside = x >= 0 && x <= rect.width && y >= 0 && y <= rect.height;
+        resizePointerTarget = inside ? { x, y } : null;
+        if (placementType && inside) {
+          decorationTarget = {
+            x: Math.max(24, Math.min(rect.width - 24, x)),
+            y: Math.max(75, Math.min(rect.height - 35, y))
+          };
+          cursorTarget = null;
+          return;
+        }
+        decorationTarget = null;
+        const bottomClearance = state.fishes.length
+          ? Math.min(...state.fishes.map(fishVerticalExtent))
+          : 20;
+        cursorTarget = inside ? {
+          x: Math.max(55, Math.min(rect.width - 55, x)),
+          y: Math.max(62, Math.min(rect.height - 35 - bottomClearance, y))
+        } : null;
+      });
+      elements.canvas.addEventListener('pointerleave', () => {
+        cursorTarget = null;
+        decorationTarget = null;
+        resizePointerTarget = null;
+      });
+      elements.canvas.addEventListener('pointerdown', event => {
+        if (!placementType ||
+          (placementType === 'castle' ? state.castleInventory < 1 : state.seaweedInventory < 1)) return;
+        const { x, y, rect } = getCanvasPointer(event);
+        if (x < 0 || x > rect.width || y < 0 || y > rect.height) return;
+        event.preventDefault();
+        const normalizedX = Math.max(0.04, Math.min(0.96, x / rect.width));
+        const normalizedY = Math.max(75, Math.min(rect.height - 35, y)) / rect.height;
+        const placedType = placementType;
+        if (placedType === 'castle') {
+          state.castles.push({ x: normalizedX, y: normalizedY, scale: castlePlacementScale });
+          state.castleInventory -= 1;
+        } else {
+          state.seaweed.push({ x: normalizedX, y: normalizedY });
+          state.seaweedInventory -= 1;
+        }
+        if (placementType === 'castle' && state.castleInventory === 0) {
+          placementType = state.seaweedInventory > 0 ? 'seaweed' : null;
+        } else if (placementType === 'seaweed' && state.seaweedInventory === 0) {
+          placementType = state.castleInventory > 0 ? 'castle' : null;
+        }
+        if (!placementType) decorationTarget = null;
+        save();
+        render();
+        const placedLabel = placedType === 'castle' ? 'Stone castle' : 'Seaweed';
+        const nextLabel = placementType === 'castle' ? 'Stone castle' : 'Seaweed';
+        showNotice(placementType
+          ? `${placedLabel} placed! ${nextLabel} is ready to place.`
+          : `${placedLabel} placed in your aquarium.`);
+      });
+
+      function beginFoodDrag(foodType, event) {
+        const inventory = foodType === 'super'
+          ? state.superFood
+          : foodType === 'yummy' ? state.yummyFood : state.food;
+        if (inventory < 1) {
+          showNotice(foodType === 'super'
+            ? 'The super-food flask is empty. Solve a decimal-fraction question in the Shop.'
+            : foodType === 'yummy'
+              ? 'The yummy-food jar is empty. Solve an algebra question in the Shop.'
+              : 'The jar is empty. Earn food manually in the Shop by solving a math question.');
+          return;
+        }
+        if (!state.fishes.some(fish => fish.fed < FOOD_QUOTA)) {
+          showNotice('All your fish have completed today’s food quota.');
+          return;
+        }
+        event.preventDefault();
+        draggingFood = foodType;
+        dragPointer = { x: event.clientX, y: event.clientY };
+        elements.canvas.style.cursor = 'grabbing';
+      }
+
+      elements.foodJar.addEventListener('pointerdown', event => beginFoodDrag('regular', event));
+      elements.superFoodFlask.addEventListener('pointerdown', event => beginFoodDrag('super', event));
+      elements.yummyFoodFlask.addEventListener('pointerdown', event => beginFoodDrag('yummy', event));
+
+      elements.foodJar.addEventListener('click', event => {
+        if (event.detail !== 0) return;
+        const fish = state.fishes.find(item => item.fed < FOOD_QUOTA);
+        if (fish) feedFish(fish.id);
+      });
+      elements.superFoodFlask.addEventListener('click', event => {
+        if (event.detail !== 0) return;
+        const fish = state.fishes.find(item => item.fed < FOOD_QUOTA);
+        if (fish) feedFish(fish.id, 'super');
+      });
+      elements.yummyFoodFlask.addEventListener('click', event => {
+        if (event.detail !== 0) return;
+        const fish = state.fishes.find(item => item.fed < FOOD_QUOTA);
+        if (fish) feedFish(fish.id, 'yummy');
+      });
+
+      window.addEventListener('pointermove', event => {
+        if (!draggingFood) return;
+        dragPointer = { x: event.clientX, y: event.clientY };
+      });
+
+      window.addEventListener('pointerup', event => {
+        if (!draggingFood) return;
+        const { x, y, rect } = getCanvasPointer(event);
+        const fish = x >= 0 && x <= rect.width && y >= 0 && y <= rect.height ? findFishAt(x, y) : null;
+        const foodType = draggingFood;
+        draggingFood = null;
+        dragPointer = null;
+        elements.canvas.style.cursor = 'grab';
+        if (fish) feedFish(fish.id, foodType);
+        else showNotice('Drop the food on a fish to feed it.');
+      });
+      window.addEventListener('pointercancel', () => {
+        draggingFood = null;
+        dragPointer = null;
+        elements.canvas.style.cursor = 'grab';
+      });
+
+      function activateTab(tab) {
+        const panels = [
+          [elements.aquariumTab, elements.aquariumPanel, 'aquarium'],
+          [elements.shopTab, elements.shopPanel, 'shop'],
+          [elements.fishesTab, elements.fishesPanel, 'fishes'],
+          [elements.otherTab, elements.otherPanel, 'other']
+        ];
+        panels.forEach(([button, panel, name]) => {
+          const selected = tab === name;
+          panel.hidden = !selected;
+          button.setAttribute('aria-selected', String(selected));
+        });
+        if (tab !== 'aquarium') {
+          cursorTarget = null;
+          decorationTarget = null;
+        }
+        if (tab === 'fishes') renderFishEditors();
+        if (tab === 'aquarium') resizeCanvas();
+      }
+
+      function positionTutorial() {
+        if (!tutorialTarget) return;
+        elements.tutorialArrow.setAttribute('viewBox', `0 0 ${window.innerWidth} ${window.innerHeight}`);
+        const target = document.getElementById(tutorialTarget);
+        if (!target) return;
+        const targetRect = target.getBoundingClientRect();
+        const cardRect = elements.tutorialCard.getBoundingClientRect();
+        const margin = 16;
+        const cardX = Math.max(margin, (window.innerWidth - cardRect.width) / 2);
+        const availableAbove = targetRect.top - margin;
+        const availableBelow = window.innerHeight - targetRect.bottom - margin;
+        const placeAbove = availableBelow < cardRect.height + 24 && availableAbove > availableBelow;
+        const cardY = placeAbove
+          ? Math.max(margin, targetRect.top - cardRect.height - 24)
+          : Math.min(window.innerHeight - cardRect.height - margin, targetRect.bottom + 24);
+        elements.tutorialCard.style.left = `${cardX}px`;
+        elements.tutorialCard.style.top = `${cardY}px`;
+        const fromX = Math.max(cardX + 24, Math.min(cardX + cardRect.width - 24, targetRect.left + targetRect.width / 2));
+        const fromY = placeAbove ? cardY + cardRect.height : cardY;
+        const toX = targetRect.left + targetRect.width / 2;
+        const toY = placeAbove ? targetRect.bottom + 7 : targetRect.top - 7;
+        const curveY = (fromY + toY) / 2;
+        elements.tutorialHighlight.setAttribute('x', String(targetRect.left - 8));
+        elements.tutorialHighlight.setAttribute('y', String(targetRect.top - 8));
+        elements.tutorialHighlight.setAttribute('width', String(targetRect.width + 16));
+        elements.tutorialHighlight.setAttribute('height', String(targetRect.height + 16));
+        elements.tutorialHighlight.setAttribute('rx', target.tagName === 'CANVAS' ? '20' : '14');
+        elements.tutorialArrowPath.setAttribute('d', `M ${fromX} ${fromY} Q ${fromX} ${curveY} ${toX} ${toY}`);
+      }
+
+      function showTutorialStep() {
+        const step = tutorialSteps[tutorialStep];
+        document.querySelectorAll('.tutorial-target').forEach(element => element.classList.remove('tutorial-target'));
+        activateTab(step.tab);
+        tutorialTarget = step.target;
+        const target = document.getElementById(step.target);
+        target.classList.add('tutorial-target');
+        const targetRect = target.getBoundingClientRect();
+        window.scrollTo(0, Math.max(0, window.scrollY + targetRect.top - 90));
+        elements.tutorialStepCount.textContent = `Step ${tutorialStep + 1} of ${tutorialSteps.length}`;
+        elements.tutorialTitle.textContent = step.title;
+        elements.tutorialCopy.textContent = step.text;
+        elements.tutorialBack.disabled = tutorialStep === 0;
+        elements.tutorialNext.textContent = tutorialStep === tutorialSteps.length - 1 ? 'Finish ✓' : 'Next →';
+        positionTutorial();
+      }
+
+      function closeTutorial() {
+        document.querySelectorAll('.tutorial-target').forEach(element => element.classList.remove('tutorial-target'));
+        elements.tutorialShade.hidden = true;
+        elements.tutorialArrow.setAttribute('hidden', '');
+        elements.tutorialCard.hidden = true;
+        tutorialTarget = null;
+        state.tutorialDone = true;
+        save();
+      }
+
+      function openTutorial() {
+        tutorialStep = 0;
+        elements.tutorialShade.hidden = false;
+        elements.tutorialArrow.removeAttribute('hidden');
+        elements.tutorialCard.hidden = false;
+        showTutorialStep();
+        elements.tutorialNext.focus();
+      }
+
+      elements.tutorialTrigger.addEventListener('click', openTutorial);
+      elements.tutorialSkip.addEventListener('click', closeTutorial);
+      elements.tutorialBack.addEventListener('click', () => {
+        if (tutorialStep > 0) {
+          tutorialStep -= 1;
+          showTutorialStep();
+        }
+      });
+      elements.tutorialNext.addEventListener('click', () => {
+        if (tutorialStep === tutorialSteps.length - 1) closeTutorial();
+        else {
+          tutorialStep += 1;
+          showTutorialStep();
+        }
+      });
+      elements.developerTrigger.addEventListener('click', () => {
+        if (state.developerUnlocked) {
+          elements.developerTools.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          return;
+        }
+        elements.developerError.textContent = '';
+        elements.developerPin.value = '';
+        elements.developerDialog.hidden = false;
+        elements.developerPin.focus();
+      });
+      elements.developerCancel.addEventListener('click', () => {
+        elements.developerDialog.hidden = true;
+      });
+      elements.developerForm.addEventListener('submit', event => {
+        event.preventDefault();
+        if (elements.developerPin.value !== DEVELOPER_PIN) {
+          elements.developerError.textContent = 'That PIN is not correct.';
+          elements.developerPin.select();
+          return;
+        }
+        state.developerUnlocked = true;
+        save();
+        elements.developerDialog.hidden = true;
+        render();
+        writeDeveloperConsole('Developer mode unlocked. Enter a command.');
+        elements.developerCommand.focus();
+      });
+      elements.developerCommandForm.addEventListener('submit', event => {
+        event.preventDefault();
+        const command = elements.developerCommand.value;
+        writeDeveloperConsole(`> ${command}`);
+        executeDeveloperCommand(command);
+        elements.developerCommand.value = '';
+        elements.developerCommand.focus();
+      });
+      elements.devLock.addEventListener('click', () => {
+        state.developerUnlocked = false;
+        save();
+        render();
+        showNotice('Developer mode locked.');
+      });
+
+      elements.resetTrigger.addEventListener('click', () => {
+        resetStage = 0;
+        elements.resetTitle.textContent = 'Hard reset?';
+        elements.resetCopy.textContent = 'This permanently resets the current account’s fish, food, coins, streak, and developer settings. Other accounts will not be affected.';
+        elements.resetFinal.hidden = true;
+        elements.resetContinue.hidden = false;
+        elements.resetConfirm.hidden = true;
+        elements.resetConfirmation.value = '';
+        elements.resetDialog.hidden = false;
+      });
+      elements.accountTrigger.addEventListener('click', () => {
+        if (accounts.length <= 1) {
+          createNewAccount();
+          return;
+        }
+        renderAccountMenu();
+        elements.accountMenu.hidden = !elements.accountMenu.hidden;
+        elements.accountTrigger.setAttribute('aria-expanded', String(!elements.accountMenu.hidden));
+      });
+      elements.createAccount.addEventListener('click', createNewAccount);
+      document.addEventListener('click', event => {
+        if (!elements.accountMenu.hidden && !elements.accountMenu.contains(event.target) &&
+          event.target !== elements.accountTrigger) {
+          closeAccountMenu();
+        }
+      });
+      elements.zeroFishAction.addEventListener('click', () => {
+        if (state.fishes.length) return;
+        if (state.coins >= FISH_COST) {
+          zeroFishPopupDismissed = true;
+          elements.zeroFishDialog.hidden = true;
+          activateTab('shop');
+          elements.buyFish.focus();
+          return;
+        }
+        zeroFishPopupDismissed = true;
+        elements.zeroFishDialog.hidden = true;
+        elements.resetTrigger.click();
+      });
+      elements.resetContinue.addEventListener('click', () => {
+        resetStage = 1;
+        elements.resetTitle.textContent = 'Final confirmation';
+        elements.resetCopy.textContent = 'This cannot be undone. Type RESET below, then choose “Reset account” to start over with one fish.';
+        elements.resetFinal.hidden = false;
+        elements.resetContinue.hidden = true;
+        elements.resetConfirm.hidden = false;
+        elements.resetConfirmation.focus();
+      });
+      elements.resetConfirmation.addEventListener('input', () => {
+        elements.resetConfirm.disabled = elements.resetConfirmation.value !== 'RESET';
+      });
+      elements.resetConfirm.addEventListener('click', () => {
+        if (resetStage !== 1 || elements.resetConfirmation.value !== 'RESET') return;
+        try {
+          state = newGame();
+          const activeAccount = accounts.find(account => account.id === activeAccountId);
+          if (!activeAccount) throw new Error('Active account was not found.');
+          activeAccount.save = state;
+          localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(accounts));
+          localStorage.setItem(ACTIVE_ACCOUNT_KEY, activeAccountId);
+        } catch (error) {
+          showNotice('Could not clear your saved aquarium. Check your browser storage settings.');
+          return;
+        }
+        window.location.reload();
+      });
+      elements.resetCancel.addEventListener('click', () => {
+        elements.resetDialog.hidden = true;
+      });
+      window.addEventListener('resize', () => {
+        resizeCanvas();
+        if (tutorialTarget) positionTutorial();
+      });
+
+      render();
+      resizeCanvas();
+      requestAnimationFrame(drawAquarium);
+      if (!state.tutorialDone) openTutorial();
+      window.setInterval(render, 1000);
+    })();
+  </script>
+</body>
+
+</html>
