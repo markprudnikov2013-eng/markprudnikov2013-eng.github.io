@@ -110,6 +110,12 @@
       border: 8px solid #acd9d8;
       border-radius: 18px;
       background: #75cdd8;
+      transition: border-color .2s ease, box-shadow .2s ease;
+    }
+
+    .aquarium-scene.time-frozen {
+      border-color: #d8f4ff;
+      box-shadow: 0 0 0 3px #b9eaff66, 0 0 20px #9fe5ff55;
     }
 
     #aquarium-canvas {
@@ -217,6 +223,20 @@
 
     .yummy-food-flask .jar-food {
       filter: hue-rotate(300deg) saturate(1.4);
+    }
+
+    .freeze-flask {
+      border-color: #a9d9ee;
+      border-radius: 28px 28px 22px 22px;
+      background: #effaff;
+    }
+
+    .freeze-flask .jar-lid {
+      background: #78b8d1;
+    }
+
+    .freeze-flask .jar-fill {
+      background: linear-gradient(#d9f5ff, #80cce8);
     }
 
     .jar-fill {
@@ -951,6 +971,17 @@
           <div class="jar-copy"><strong>Yummy-food jar</strong> · Each serving restores 1 hunger, with a 33% chance
             to restore 2 instead. Earn servings in the Shop by solving an algebra question.</div>
         </div>
+        <div class="food-jar-wrap">
+          <button class="food-jar freeze-flask" id="freeze-flask" type="button"
+            aria-label="Freeze flask. Click to freeze game time for one day." title="Click to freeze game time for one day">
+            <span class="jar-lid" aria-hidden="true"></span>
+            <span class="jar-fill" id="freeze-fill" aria-hidden="true"></span>
+            <span class="jar-food" aria-hidden="true">❄️</span>
+            <span class="jar-count" id="freeze-count">0 / 50</span>
+          </button>
+          <div class="jar-copy"><strong>Freeze flask</strong> · Click to stop game time and fish movement for exactly
+            24 hours. Buy a flask in the Shop for 1 Mathcoin.</div>
+        </div>
       </div>
       <div class="care-bar">
         <div class="care-copy" id="deadline-copy"></div>
@@ -1018,6 +1049,12 @@
           </div>
         </article>
         <article class="shop-card">
+          <div class="shop-icon" aria-hidden="true">❄️</div>
+          <h3>Freeze</h3>
+          <p>Freeze game time and fish movement for exactly 24 hours. Store it in your Freeze flask until you need it.</p>
+          <button class="primary" id="buy-freeze" type="button">Buy a Freeze · 1 🪙</button>
+        </article>
+        <article class="shop-card">
           <div class="shop-icon" aria-hidden="true">🐡</div>
           <h3>A new fish</h3>
           <p>Bring home a new fish for 4 Mathcoins. It has its own 10-food daily quota.</p>
@@ -1076,9 +1113,10 @@
       <p class="muted" id="developer-command-help">
         Commands: <code>buy 123</code> · <code>buy NameHere, NameThere</code> ·
         <code>kill NameHere</code> · <code>give NameHere 123 food</code> ·
-        <code>immortal NameHere true/false</code> · <code>add 123 coins</code> · <code>add 123 food</code> ·
+        <code>immortal NameHere true/false</code> · <code>give NameHere 123 super food</code> ·
+        <code>give NameHere 123 yummy food</code> · <code>add 123 coins</code> · <code>add 123 food</code> ·
         <code>add 123 super food</code> · <code>add 123 yummy food</code> ·
-        <code>jump 123</code> (seconds) · <code>clear</code>
+        <code>jump 123</code> (seconds) · <code>freeze</code> · <code>unfreeze</code> · <code>clear</code>
       </p>
       <div class="developer-actions">
         <button class="secondary" id="dev-lock" type="button">Lock developer mode</button>
@@ -1161,6 +1199,8 @@
       const FOOD_CAP = 50;
       const SUPER_FOOD_CAP = 50;
       const YUMMY_FOOD_CAP = 50;
+      const FREEZE_FLASK_CAP = 50;
+      const FREEZE_DURATION_MS = 24 * 60 * 60 * 1000;
       const FISH_COST = 4;
       const LEGACY_STORAGE_KEY = 'little-aquarium-save-v1';
       const ACCOUNTS_KEY = 'little-aquarium-accounts-v1';
@@ -1190,13 +1230,16 @@
         foodJar: document.getElementById('food-jar'),
         superFoodFlask: document.getElementById('super-food-flask'),
         yummyFoodFlask: document.getElementById('yummy-food-flask'),
+        freezeFlask: document.getElementById('freeze-flask'),
         jarFill: document.getElementById('jar-fill'),
         superFoodFill: document.getElementById('super-food-fill'),
         yummyFoodFill: document.getElementById('yummy-food-fill'),
+        freezeFill: document.getElementById('freeze-fill'),
         fishCount: document.getElementById('fish-count'),
         foodCount: document.getElementById('food-count'),
         superFoodCount: document.getElementById('super-food-count'),
         yummyFoodCount: document.getElementById('yummy-food-count'),
+        freezeCount: document.getElementById('freeze-count'),
         coinCount: document.getElementById('coin-count'),
         streakCount: document.getElementById('streak-count'),
         deadlineCopy: document.getElementById('deadline-copy'),
@@ -1204,6 +1247,7 @@
         buyFood: document.getElementById('buy-food'),
         buySuperFood: document.getElementById('buy-super-food'),
         buyYummyFood: document.getElementById('buy-yummy-food'),
+        buyFreeze: document.getElementById('buy-freeze'),
         mathBox: document.getElementById('math-box'),
         mathQuestion: document.getElementById('math-question'),
         mathAnswer: document.getElementById('math-answer'),
@@ -1288,6 +1332,7 @@
         { title: 'Earn food manually', text: 'Food is never made automatically. Visit the Shop, answer a math question, and earn one food per correct answer. Your jar holds up to 50 food.', target: 'food-jar', tab: 'aquarium' },
         { title: 'Super food', text: 'Solve a decimal-fraction question in the Shop to earn super food. Drag a serving from the flask onto a fish to restore 2 hunger.', target: 'super-food-flask', tab: 'aquarium' },
         { title: 'Yummy food', text: 'Solve an algebra question in the Shop to earn yummy food. Each serving restores 1 hunger, with a 33% chance to restore 2 instead.', target: 'yummy-food-flask', tab: 'aquarium' },
+        { title: 'Freeze time', text: 'Buy a Freeze in the Shop for 1 Mathcoin, then click its flask in the Aquarium to pause fish and game time for 24 hours. It resumes automatically, even if you close the game.', target: 'freeze-flask', tab: 'aquarium' },
         { title: 'Feed every fish', text: 'Drag food from its jar or flask and drop it on the fish you want to feed. Each fish needs 10 food before local midnight or it will die.', target: 'aquarium-canvas', tab: 'aquarium' },
         { title: 'Keep your streak', text: 'Complete every fish’s quota before midnight to continue your streak. You earn 1 Mathcoin for every 2 consecutive days.', target: 'deadline-copy', tab: 'aquarium' },
         { title: 'Customize your fishes', text: 'The Fishes tab lets you change every fish’s name, color, and body shape. Try out all the options here.', target: 'fishes-tab', tab: 'fishes' },
@@ -1328,11 +1373,28 @@
         return date.getTime();
       }
 
-      function gameNow() {
+      function unfrozenGameNow() {
         const date = new Date();
         date.setDate(date.getDate() + state.dayOffset);
         date.setTime(date.getTime() + state.timeOffsetSeconds * 1000);
+        date.setTime(date.getTime() + state.timeOffsetMilliseconds);
         return date.getTime();
+      }
+
+      function gameNow() {
+        if (state.timeFrozen && Number.isFinite(state.freezeExpiresAt) &&
+          Date.now() >= state.freezeExpiresAt) {
+          const currentTime = unfrozenGameNow();
+          state.timeOffsetMilliseconds += state.frozenAt - currentTime;
+          if (!Number.isSafeInteger(state.timeOffsetMilliseconds)) {
+            throw new Error('Could not resume game time after the timed freeze expired.');
+          }
+          state.timeFrozen = false;
+          state.frozenAt = null;
+          state.freezeExpiresAt = null;
+          save();
+        }
+        return state.timeFrozen && Number.isFinite(state.frozenAt) ? state.frozenAt : unfrozenGameNow();
       }
 
       function makeFish(name = 'Bubbles', look = '🐠', color = '#ff9f43', shape = 'classic') {
@@ -1360,6 +1422,11 @@
           cycleStartedAt: localMidnight(now),
           dayOffset: 0,
           timeOffsetSeconds: 0,
+          timeOffsetMilliseconds: 0,
+          timeFrozen: false,
+          frozenAt: null,
+          freezeExpiresAt: null,
+          freezeInventory: 0,
           seaweed: [],
           seaweedInventory: 0,
           castles: [],
@@ -1392,6 +1459,19 @@
         save.dayOffset = Number.isInteger(save.dayOffset) && save.dayOffset >= 0 ? save.dayOffset : 0;
         save.timeOffsetSeconds = Number.isSafeInteger(save.timeOffsetSeconds) && save.timeOffsetSeconds >= 0
           ? save.timeOffsetSeconds
+          : 0;
+        save.timeOffsetMilliseconds = Number.isSafeInteger(save.timeOffsetMilliseconds)
+          ? save.timeOffsetMilliseconds
+          : 0;
+        save.timeFrozen = save.timeFrozen === true && Number.isFinite(save.frozenAt) &&
+          Math.abs(save.frozenAt) <= 8.64e15;
+        save.frozenAt = save.timeFrozen ? save.frozenAt : null;
+        save.freezeExpiresAt = save.timeFrozen && Number.isFinite(save.freezeExpiresAt) &&
+          save.freezeExpiresAt > 0 && save.freezeExpiresAt <= 8.64e15
+          ? save.freezeExpiresAt
+          : null;
+        save.freezeInventory = Number.isSafeInteger(save.freezeInventory) && save.freezeInventory >= 0
+          ? Math.min(save.freezeInventory, FREEZE_FLASK_CAP)
           : 0;
         save.seaweed = Array.isArray(save.seaweed)
           ? save.seaweed.filter(item => item && Number.isFinite(item.x) && item.x >= 0 && item.x <= 1 &&
@@ -1497,7 +1577,7 @@
       let noticeTimer = 0;
       const developerConsoleLines = [
         'Pool of problems developer console',
-        'Commands: buy 123 | buy NameHere, NameThere | kill NameHere | give NameHere 123 food | immortal NameHere true/false | add 123 coins | add 123 food | add 123 super food | add 123 yummy food | jump 123 | clear',
+        'Commands: buy 123 | buy NameHere, NameThere | kill NameHere | give NameHere 123 food/super food/yummy food | immortal NameHere true/false | add 123 coins/food/super food/yummy food | jump 123 | freeze | unfreeze | clear',
         'Use _all_ in place of a fish name to target every fish.'
       ];
       elements.developerCommandOutput.textContent = developerConsoleLines.join('\n');
@@ -1688,10 +1768,11 @@
           return;
         }
 
-        const giveMatch = text.match(/^give\s+(.+?)\s+(\d+)\s+food$/i);
+        const giveMatch = text.match(/^give\s+(.+?)\s+(\d+)\s+(super\s*food|yummy\s*food|food)$/i);
         if (giveMatch) {
           const requestedName = giveMatch[1].trim();
           const amount = Number(giveMatch[2]);
+          const foodType = giveMatch[3].toLowerCase().replace(/\s+/g, '');
           if (!Number.isSafeInteger(amount) || amount < 1) {
             writeDeveloperConsole('Food amount must be a positive whole number.');
             return;
@@ -1710,9 +1791,16 @@
             return;
           }
           const fed = selectedFish.map(fish => {
-            const added = Math.min(amount, FOOD_QUOTA - fish.fed);
-            fish.fed += added;
-            return { fish, added };
+            const startingFed = fish.fed;
+            let servingsUsed = 0;
+            while (servingsUsed < amount && fish.fed < FOOD_QUOTA) {
+              const hungerRestored = foodType === 'superfood'
+                ? 2
+                : foodType === 'yummyfood' && Math.random() < 1 / 3 ? 2 : 1;
+              fish.fed = Math.min(FOOD_QUOTA, fish.fed + hungerRestored);
+              servingsUsed += 1;
+            }
+            return { fish, added: fish.fed - startingFed, servingsUsed };
           });
           const totalAdded = fed.reduce((total, result) => total + result.added, 0);
           if (!totalAdded) {
@@ -1724,10 +1812,10 @@
           save();
           render();
           if (selectedFish.length === 1) {
-            const { fish, added } = fed[0];
-            writeDeveloperConsole(`Gave ${added} food to ${fish.name} (${fish.fed}/${FOOD_QUOTA} today).`);
+            const { fish, servingsUsed } = fed[0];
+            writeDeveloperConsole(`Gave ${servingsUsed} ${foodType === 'superfood' ? 'super food' : foodType === 'yummyfood' ? 'yummy food' : 'food'} serving${servingsUsed === 1 ? '' : 's'} to ${fish.name} (${fish.fed}/${FOOD_QUOTA} today).`);
           } else {
-            writeDeveloperConsole(`Gave up to ${amount} food to ${selectedFish.length} fish (${totalAdded} food total).`);
+            writeDeveloperConsole(`Gave up to ${amount} ${foodType === 'superfood' ? 'super food' : foodType === 'yummyfood' ? 'yummy food' : 'food'} servings to ${selectedFish.length} fish (${totalAdded} hunger restored total).`);
           }
           return;
         }
@@ -1771,6 +1859,41 @@
           return;
         }
 
+        if (/^freeze$/i.test(text)) {
+          if (state.timeFrozen) {
+            writeDeveloperConsole('Game time is already frozen.');
+            return;
+          }
+          state.frozenAt = unfrozenGameNow();
+          state.timeFrozen = true;
+          state.freezeExpiresAt = null;
+          save();
+          render();
+          writeDeveloperConsole('Game time frozen.');
+          return;
+        }
+
+        if (/^unfreeze$/i.test(text)) {
+          if (!state.timeFrozen) {
+            writeDeveloperConsole('Game time is not frozen.');
+            return;
+          }
+          const currentTime = unfrozenGameNow();
+          state.timeOffsetMilliseconds += state.frozenAt - currentTime;
+          if (!Number.isSafeInteger(state.timeOffsetMilliseconds)) {
+            writeDeveloperConsole('Could not unfreeze: the adjusted game time is outside the supported range.');
+            state.timeOffsetMilliseconds -= state.frozenAt - currentTime;
+            return;
+          }
+          state.timeFrozen = false;
+          state.frozenAt = null;
+          state.freezeExpiresAt = null;
+          save();
+          render();
+          writeDeveloperConsole('Game time resumed.');
+          return;
+        }
+
         const jumpMatch = text.match(/^jump\s+(\d+)$/i);
         if (jumpMatch) {
           const seconds = Number(jumpMatch[1]);
@@ -1781,14 +1904,18 @@
             writeDeveloperConsole('Jump duration must be a positive number of seconds within the supported date range.');
             return;
           }
-          state.timeOffsetSeconds += seconds;
+          if (state.timeFrozen) {
+            state.frozenAt += seconds * 1000;
+          } else {
+            state.timeOffsetSeconds += seconds;
+          }
           save();
           render();
           writeDeveloperConsole(`Skipped ${seconds} seconds.`);
           return;
         }
 
-        writeDeveloperConsole('Unknown command. Use buy 123, buy NameHere, NameThere, kill NameHere, give NameHere 123 food, immortal NameHere true/false, add 123 coins/food/super food/yummy food, jump 123, or clear.');
+        writeDeveloperConsole('Unknown command. Use buy 123, buy NameHere, NameThere, kill NameHere, give NameHere 123 food/super food/yummy food, immortal NameHere true/false, add 123 coins/food/super food/yummy food, jump 123, freeze, unfreeze, or clear.');
       }
 
       function renderAccountMenu() {
@@ -1940,6 +2067,15 @@
         elements.yummyFoodFlask.title = state.yummyFood
           ? `${state.yummyFood} yummy-food serving${state.yummyFood === 1 ? '' : 's'} available. Drag one onto a fish.`
           : 'The yummy-food jar is empty. Solve an algebra question in the Shop.';
+        elements.freezeCount.textContent = `${state.freezeInventory} / ${FREEZE_FLASK_CAP}`;
+        elements.freezeFill.style.height = `${(state.freezeInventory / FREEZE_FLASK_CAP) * 100}%`;
+        elements.freezeFlask.disabled = state.freezeInventory === 0 || state.timeFrozen;
+        elements.freezeFlask.title = state.timeFrozen
+          ? 'Game time is already frozen.'
+          : state.freezeInventory
+            ? `${state.freezeInventory} Freeze${state.freezeInventory === 1 ? '' : 's'} available. Click to freeze game time for 24 hours.`
+            : 'The Freeze flask is empty. Buy one in the Shop for 1 Mathcoin.';
+        document.querySelector('.aquarium-scene').classList.toggle('time-frozen', state.timeFrozen);
         elements.coinCount.textContent = String(state.coins);
         elements.streakCount.textContent = `${state.streak} day${state.streak === 1 ? '' : 's'}`;
         elements.fishCount.textContent = `${state.fishes.length} fish`;
@@ -1964,6 +2100,7 @@
         elements.buyFood.disabled = state.food >= FOOD_CAP;
         elements.buySuperFood.disabled = state.superFood >= SUPER_FOOD_CAP;
         elements.buyYummyFood.disabled = state.yummyFood >= YUMMY_FOOD_CAP;
+        elements.buyFreeze.disabled = state.coins < 1 || state.freezeInventory >= FREEZE_FLASK_CAP;
         elements.developerTools.hidden = !state.developerUnlocked;
         elements.developerTrigger.textContent = state.developerUnlocked ? '🔓 Developer mode' : '🔒 Developer mode';
         renderFishEditors();
@@ -2379,6 +2516,7 @@
       }
 
       function drawAquarium(timestamp) {
+        const frameElapsed = Math.max(0, timestamp - lastFrame);
         const dt = Math.min((timestamp - lastFrame) / 1000 || 0, 0.04);
         lastFrame = timestamp;
         ensureFishMotion();
@@ -2467,8 +2605,13 @@
             fishArrival.targetX = canvasWidth * 0.5;
             fishArrival.targetY = canvasHeight * 0.48;
           }
+          if (state.timeFrozen && isArriving && fishArrival.startedAt !== null) {
+            fishArrival.startedAt += frameElapsed;
+          }
           const arrivalElapsed = isArriving ? timestamp - fishArrival.startedAt : Infinity;
-          if (isArriving && arrivalElapsed < fishArrival.dropDuration) {
+          if (state.timeFrozen) {
+            // Keep the fish and any arrival animation fixed while game time is paused.
+          } else if (isArriving && arrivalElapsed < fishArrival.dropDuration) {
             const progress = Math.max(0, arrivalElapsed / fishArrival.dropDuration);
             const eased = 1 - Math.pow(1 - progress, 3) + Math.sin(progress * Math.PI * 3) * (1 - progress) * 0.055;
             motion.x = fishArrival.startX + (fishArrival.targetX - fishArrival.startX) * progress;
@@ -2665,7 +2808,7 @@
           showNotice('Your super-food flask is full.');
           return;
         }
-        currentSuperFoodQuestion = makeSuperFoodQuestion();
+        if (!currentSuperFoodQuestion) currentSuperFoodQuestion = makeSuperFoodQuestion();
         elements.superFoodMathQuestion.textContent = currentSuperFoodQuestion.text;
         elements.superFoodMathFeedback.textContent = '';
         elements.superFoodMathFeedback.className = 'feedback';
@@ -2679,7 +2822,7 @@
           showNotice('Your yummy-food jar is full.');
           return;
         }
-        currentYummyFoodQuestion = makeYummyFoodQuestion();
+        if (!currentYummyFoodQuestion) currentYummyFoodQuestion = makeYummyFoodQuestion();
         elements.yummyFoodMathQuestion.textContent = currentYummyFoodQuestion.text;
         elements.yummyFoodMathFeedback.textContent = '';
         elements.yummyFoodMathFeedback.className = 'feedback';
@@ -2703,6 +2846,38 @@
       elements.buyFood.addEventListener('click', openFoodQuestion);
       elements.buySuperFood.addEventListener('click', openSuperFoodQuestion);
       elements.buyYummyFood.addEventListener('click', openYummyFoodQuestion);
+      elements.buyFreeze.addEventListener('click', () => {
+        if (state.coins < 1) {
+          showNotice('You need 1 Mathcoin to buy a Freeze.');
+          return;
+        }
+        if (state.freezeInventory >= FREEZE_FLASK_CAP) {
+          showNotice('Your Freeze flask is full.');
+          return;
+        }
+        state.coins -= 1;
+        state.freezeInventory += 1;
+        save();
+        render();
+        showNotice('Bought 1 Freeze. Click its flask in the Aquarium when you need it.');
+      });
+      elements.freezeFlask.addEventListener('click', () => {
+        if (state.timeFrozen) {
+          showNotice('Game time is already frozen.');
+          return;
+        }
+        if (state.freezeInventory < 1) {
+          showNotice('Your Freeze flask is empty. Buy a Freeze in the Shop for 1 Mathcoin.');
+          return;
+        }
+        state.freezeInventory -= 1;
+        state.frozenAt = unfrozenGameNow();
+        state.timeFrozen = true;
+        state.freezeExpiresAt = Date.now() + FREEZE_DURATION_MS;
+        save();
+        render();
+        showNotice('Time is frozen. It will resume automatically in 24 hours.');
+      });
       elements.answerForm.addEventListener('submit', event => {
         event.preventDefault();
         if (!currentQuestion) return;
